@@ -16,16 +16,16 @@ import os
     # Save scraped audio to file
 
 
-def main():
-    bookDict = userBookChoice()
-    queryUrl = getQueryUrl(bookDict)
-    soup = cookSoup(queryUrl)
-    articles = getBookOptions(soup,bookDict)
-    selected_index = selectIndex(articles)
-    article = chooseBook(articles, selected_index)
-    audioFiles = scrapeAudio(article)
-    for idx, file in audioFiles.items():
-        print(f"{idx}. {file}")
+# def main():
+#     bookDict = userBookChoice()
+#     queryUrl = getQueryUrl(bookDict)
+#     soup = cookSoup(queryUrl)
+#     articles = getBookOptions(soup,bookDict)
+#     selected_index = selectIndex(articles)
+#     article = chooseBook(articles, selected_index)
+#     audioFiles = scrapeAudio(article)
+#     for idx, file in audioFiles.items():
+#         print(f"{idx}. {file}")
     # saveFolderPath= selectSaveFolder(bookDict)
     # audioRequest(audioFiles,bookDict,saveFolderPath)
     
@@ -34,11 +34,11 @@ def getKnownSites():
         data = json.load(file)
     return data
 
-def userBookChoice():
-    title = input('Book Title: ')
-    author = input('Author: ')
-    queryDict = {'title':title, 'author':author}
-    return queryDict
+# def userBookChoice():
+#     title = input('Book Title: ')
+#     author = input('Author: ')
+#     queryDict = {'title':title, 'author':author}
+#     return queryDict
 
 def getQueryUrl(queryDict):
     queryTitle = queryDict.get('title').strip().replace(' ','+')
@@ -65,22 +65,22 @@ def getBookOptions(soup,bookDict):
             bookOptions[title] = article
     return bookOptions
 
-def selectIndex(options):
-    titleOptions = list(options.keys())
-    for idx, title in enumerate(titleOptions, start=1):
-        print(f"{idx}. {title}")
-    while True:
-        try:
-            choice = int(input("Enter the number of the book you want to select: "))
-            if 1 <= choice <= len(titleOptions):
-                selected_title = titleOptions[choice-1]
-                print(f"You selected: {selected_title}")
-                break
-            else:
-                print(f"Please enter a number between 1 and {len(titleOptions)}.")
-        except ValueError:
-            print("Invalid input. Please enter a number.")
-    return choice
+# def selectIndex(options):
+#     titleOptions = list(options.keys())
+#     for idx, title in enumerate(titleOptions, start=1):
+#         print(f"{idx}. {title}")
+#     while True:
+#         try:
+#             choice = int(input("Enter the number of the book you want to select: "))
+#             if 1 <= choice <= len(titleOptions):
+#                 selected_title = titleOptions[choice-1]
+#                 print(f"You selected: {selected_title}")
+#                 break
+#             else:
+#                 print(f"Please enter a number between 1 and {len(titleOptions)}.")
+#         except ValueError:
+#             print("Invalid input. Please enter a number.")
+#     return choice
 
 def chooseBook(options, selection_index):
     titleOptions = list(options.keys())
