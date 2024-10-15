@@ -1,0 +1,15 @@
+{
+    "hdAudioBooks":{
+        "base_url":"https://hdaudiobooks.net/",
+        "search_url":"https://hdaudiobooks.net//?s={query}",
+        "audio_selector":"",
+        "file_link_attr":""
+    },
+    
+    "dailyAudioBooks":{
+        "base_url":"https://dailyaudiobooks.co/",
+        "search_url":"https://dailyaudiobooks.co/?s=",
+        "audio_selector":"",
+        "file_link_attr":""
+    }
+}
