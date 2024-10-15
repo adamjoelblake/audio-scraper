@@ -8,7 +8,7 @@ book_options_cache = {}
 
 @app.route('/')
 def home():
-    return "Welcome to the Audiobook Scraper API"
+    return jsonify({"message": "Welcome to the Audiobook Scraper API"})
 
 # First route: Accepts book title and may request additional input (First half of main function)
 @app.route('/scrape', methods=['POST'])
