@@ -23,7 +23,8 @@ def main():
     queryUrl = getQueryUrl(bookDict)
     soup = cookSoup(queryUrl)
     articles = getBookOptions(soup,bookDict)
-    article = chooseBook(articles)
+    selected_index = selectIndex(articles)
+    article = chooseBook(articles, selected_index)
     audioFiles = scrapeAudio(article)
     saveFolderPath= selectSaveFolder(bookDict)
     audioRequest(audioFiles,bookDict,saveFolderPath)
@@ -64,7 +65,7 @@ def getBookOptions(soup,bookDict):
             bookOptions[title] = article
     return bookOptions
 
-def chooseBook(options):
+def selectIndex(options):
     titleOptions = list(options.keys())
     for idx, title in enumerate(titleOptions, start=1):
         print(f"{idx}. {title}")
@@ -79,6 +80,11 @@ def chooseBook(options):
                 print(f"Please enter a number between 1 and {len(titleOptions)}.")
         except ValueError:
             print("Invalid input. Please enter a number.")
+    return choice
+
+def chooseBook(options, selection_index):
+    titleOptions = list(options.keys())
+    selected_title = titleOptions[selection_index - 1]
     return options[selected_title]
 
 def scrapeAudio(article):
