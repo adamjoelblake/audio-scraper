@@ -2,8 +2,6 @@ from bs4 import BeautifulSoup
 import requests
 import json
 import os
-from tkinter import Tk
-from tkinter import filedialog
 
 
 # Pseudo Code
@@ -121,13 +119,10 @@ def audioRequest(audioFiles,bookDict,folder):
             print(f"Failed to download {url}. Status code: {response.status_code}")
 
 def selectSaveFolder(bookDict):
-    bookTitle = bookDict.get('title')
-    root = Tk()
-    root.withdraw()
-    folder_selected = filedialog.askdirectory(title="Select a folder to save the audiobook")
-    audioBookFolderName = bookTitle.strip().replace(' ','_')
-    audioBookFolderPath = os.path.join(folder_selected,audioBookFolderName)
-    os.makedirs(audioBookFolderPath)
+    bookTitle = bookDict.get('title').strip().replace(' ', '_')
+    folder_selected = '/app/data/'  # Default directory in Heroku
+    audioBookFolderPath = os.path.join(folder_selected, bookTitle)
+    os.makedirs(audioBookFolderPath, exist_ok=True)
     return audioBookFolderPath
 
 main()
