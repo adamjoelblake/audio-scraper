@@ -26,8 +26,10 @@ def main():
     selected_index = selectIndex(articles)
     article = chooseBook(articles, selected_index)
     audioFiles = scrapeAudio(article)
-    saveFolderPath= selectSaveFolder(bookDict)
-    audioRequest(audioFiles,bookDict,saveFolderPath)
+    for idx, file in audioFiles.items():
+        print(f"{idx}. {file}")
+    # saveFolderPath= selectSaveFolder(bookDict)
+    # audioRequest(audioFiles,bookDict,saveFolderPath)
     
 def getKnownSites():
     with open('knownSites.json', 'r') as file:
