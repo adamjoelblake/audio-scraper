@@ -24,15 +24,19 @@ def scrapeBookOptions():
         # Return 200 for preflight OPTIONS requests
         return jsonify({'status': 'preflight'}), 200
     
-    # Get user input
-    data = request.json
-    book_title = data.get('title')
-    book_author = data.get('author')
-    bookDict = {'title':book_title, 'author':book_author}
-
     try:
+        # Get user input
+        data = request.json
+        print(f"Received data: {data}")
+        book_title = data.get('title')
+        book_author = data.get('author')
+        print(f"Book title: {book_title}")
+        bookDict = {'title':book_title, 'author':book_author}
+
+    
         # First half of main function
         queryUrl = main.getQueryUrl(bookDict)
+        print(f"Query URL: {queryUrl}")
         soup = main.cookSoup(queryUrl)
         articles = main.getBookOptions(soup,bookDict)
 
