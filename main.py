@@ -41,16 +41,19 @@ def getKnownSites():
 #     return queryDict
 
 def getQueryUrl(queryDict):
-    queryTitle = queryDict.get('title').strip().replace(' ','+')
-    queryAuthor = queryDict.get('author').strip().replace(' ','+')
-    query = queryTitle + '+' + queryAuthor
-    print(f"Query: {query}")
-    site = getKnownSites().get("dailyAudioBooks")
-    print(f"Site: {site}")
-    searchUrl = site.get('search_url')
-    queryUrl = searchUrl + query
-    print(f"Query Url: {queryUrl}")
-    return queryUrl
+    try:
+        queryTitle = queryDict.get('title').strip().replace(' ','+')
+        queryAuthor = queryDict.get('author').strip().replace(' ','+')
+        query = queryTitle + '+' + queryAuthor
+        print(f"Query: {query}")
+        site = getKnownSites().get("dailyAudioBooks")
+        print(f"Site: {site}")
+        searchUrl = site.get('search_url')
+        queryUrl = searchUrl + query
+        print(f"Query Url: {queryUrl}")
+        return queryUrl
+    except Exception as e:
+        print(f"Error in main function getQueryUrl: {e}")
 
 def cookSoup(url):
     response = requests.get(url)
