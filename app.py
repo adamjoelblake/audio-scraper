@@ -1,4 +1,5 @@
 from flask import Flask, request, jsonify, session
+from flask_session import Session
 from flask_cors import CORS
 import main
 
@@ -47,6 +48,8 @@ def scrapeBookOptions():
         print("Getting book options")
         # book Opitons is a dictionary stored as {Entry tile: audiofiles{index:audio file url}}
         bookOptions = main.getBookOptions(soup,bookDict)
+        for key, value in bookOptions:
+            print(f"bookOptions {key}: {value}")
 
         if not bookOptions:
             return jsonify({'error': 'No matching books found!'}), 404
@@ -55,6 +58,7 @@ def scrapeBookOptions():
         # Cache the book options (use request session or another method for long-term storage)
         session['options'] =  bookOptions
         session['bookDict'] = bookDict
+        app.logger.info(f"Session data size: {len(json.dumps(session))} bytes")
 
         # Return book options to front end for user to choose
         return jsonify({'bookOptions': list(bookOptions.keys())})
