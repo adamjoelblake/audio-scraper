@@ -119,10 +119,11 @@ def scrapeAudio(article):
         audioTags = article.find_all('audio')
     
         for idx, tag in audioTags:
-            audioSrc = tag.get('src')
-            if audioSrc:
-                audioUrls[idx] = audioSrc
-                print(f"Audio file {idx}: {audioSrc}")
+            url = tag.get_text(strip=True)
+            audioUrls[idx] = url
+        
+        for idx, url in audioUrls.items():
+            print(f"{idx}: {url}")
         return audioUrls
     except Exception as e:
         print(f"Error in main function scrapeAudio: {e}")

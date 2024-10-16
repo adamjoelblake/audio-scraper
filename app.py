@@ -78,7 +78,7 @@ def scrapeBookOptions():
 def scrapeAudio():
     try:
         data = request.json
-        selected_book_index = int(data.get('selection'))
+        selected_book_index = data.get('selection')
         print(f"Selected book index: {selected_book_index}")
         
         # retrieved cached book options
