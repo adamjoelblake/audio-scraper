@@ -30,9 +30,12 @@ import os
     # audioRequest(audioFiles,bookDict,saveFolderPath)
     
 def getKnownSites():
-    with open('knownSites.json', 'r') as file:
-        data = json.load(file)
-    return data
+    try:
+        with open('knownSites.json', 'r') as file:
+            data = json.load(file)
+        return data
+    except Exception as e:
+        print(f"Error in main function getKnownSites: {e}")
 
 # def userBookChoice():
 #     title = input('Book Title: ')
@@ -43,8 +46,10 @@ def getKnownSites():
 def getQueryUrl(queryDict):
     try:
         queryTitle = queryDict.get('title').strip().replace(' ','+')
-        queryAuthor = queryDict.get('author').strip().replace(' ','+')
-        query = queryTitle + '+' + queryAuthor
+        if queryDict.get('author'):
+            queryAuthor = queryDict.get('author').strip().replace(' ','+')
+            query = queryTitle + '+' + queryAuthor      
+        query = queryTitle
         print(f"Query: {query}")
         site = getKnownSites().get("dailyAudioBooks")
         print(f"Site: {site}")
@@ -56,20 +61,27 @@ def getQueryUrl(queryDict):
         print(f"Error in main function getQueryUrl: {e}")
 
 def cookSoup(url):
-    response = requests.get(url)
-    soup = BeautifulSoup(response.text, 'html.parser')
-    return soup
+    try:
+        response = requests.get(url)
+        soup = BeautifulSoup(response.text, 'html.parser')
+        return soup
+    except Exception as e:
+        print(f"Error in main function cookSoup: {e}")
 
 def getBookOptions(soup,bookDict):
-    bookOptions = {}
-    userTitle = bookDict.get('title').lower()
-    articles = soup.find('section', id='content').find_all('article')
-    for article in articles:
-        title = article.find('h2').text
-        cleanTitle = title.strip().lower()
-        if userTitle in cleanTitle:
-            bookOptions[title] = article
-    return bookOptions
+    try:
+        bookOptions = {}
+        userTitle = bookDict.get('title').lower()
+        articles = soup.find('section', id='content').find_all('article')
+        for article in articles:
+            title = article.find('h2').text
+            cleanTitle = title.strip().lower()
+            if userTitle in cleanTitle:
+                bookOptions[title] = article
+        return bookOptions
+    
+    except Exception as e:
+        print(f"Error in main function getBookOptions: {e}")
 
 # def selectIndex(options):
 #     titleOptions = list(options.keys())
@@ -89,46 +101,58 @@ def getBookOptions(soup,bookDict):
 #     return choice
 
 def chooseBook(options, selection_index):
-    titleOptions = list(options.keys())
-    selected_title = titleOptions[selection_index - 1]
-    return options[selected_title]
+    try:
+        titleOptions = list(options.keys())
+        selected_title = titleOptions[selection_index - 1]
+        return options[selected_title]
+    except Exception as e:
+        print(f"Error in main function chooseBook: {e}")
 
 def scrapeAudio(article):
-    audiofiles= []
-    audioURLs= {}
-    audioTags = article.find_all('audio')
-    for tag in audioTags:
-        file = tag.get_text(strip=True)
-        audiofiles.append(file)
-    for idx, file in enumerate(audiofiles, start=1):
-        audioURLs[idx] = file
-    return audioURLs
+    try:
+        audiofiles= []
+        audioURLs= {}
+        audioTags = article.find_all('audio')
+        for tag in audioTags:
+            file = tag.get_text(strip=True)
+            audiofiles.append(file)
+        for idx, file in enumerate(audiofiles, start=1):
+            audioURLs[idx] = file
+        return audioURLs
+    except Exception as e:
+        print(f"Error in main function scrapeAudio: {e}")
 
 def audioRequest(audioFiles,bookDict,folder):
-    title = bookDict.get('title').strip().replace(' ','_')
-    for index, url in audioFiles.items():
-        # Prepare save file
-        file_name = f"{title}_{index:02}.mp3"
-        file_path = os.path.join(folder,file_name)
+    try:
+        title = bookDict.get('title').strip().replace(' ','_')
+        for index, url in audioFiles.items():
+            # Prepare save file
+            file_name = f"{title}_{index:02}.mp3"
+            file_path = os.path.join(folder,file_name)
 
-        # Send GET request
-        response = requests.get(url, stream=True)
-        # Ensure response was recieved
-        if response.status_code == 200:
-            # Save audio file
-            with open(file_path, 'wb') as file:
-                for chunk in response.iter_content(chunk_size=1024):
-                    if chunk:
-                        file.write(chunk)
-            print(f"Downloaded {file_name}")
-        else:
-            print(f"Failed to download {url}. Status code: {response.status_code}")
+            # Send GET request
+            response = requests.get(url, stream=True)
+            # Ensure response was recieved
+            if response.status_code == 200:
+                # Save audio file
+                with open(file_path, 'wb') as file:
+                    for chunk in response.iter_content(chunk_size=1024):
+                        if chunk:
+                            file.write(chunk)
+                print(f"Downloaded {file_name}")
+            else:
+                print(f"Failed to download {url}. Status code: {response.status_code}")
+    except Exception as e:
+        print(f"Error in main function audioRequest: {e}")
 
 def selectSaveFolder(bookDict):
-    bookTitle = bookDict.get('title').strip().replace(' ', '_')
-    folder_selected = '/app/data/'  # Default directory in Heroku
-    audioBookFolderPath = os.path.join(folder_selected, bookTitle)
-    os.makedirs(audioBookFolderPath, exist_ok=True)
-    return audioBookFolderPath
+    try:
+        bookTitle = bookDict.get('title').strip().replace(' ', '_')
+        folder_selected = '/app/data/'  # Default directory in Heroku
+        audioBookFolderPath = os.path.join(folder_selected, bookTitle)
+        os.makedirs(audioBookFolderPath, exist_ok=True)
+        return audioBookFolderPath
+    except Exception as e:
+        print(f"Error in main function selectSaveFolder: {e}")
 
 # main()
