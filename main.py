@@ -77,7 +77,8 @@ def getBookOptions(soup,bookDict):
             title = article.find('h2').text
             cleanTitle = title.strip().lower()
             if userTitle in cleanTitle:
-                bookOptions[title] = article
+                audioUrlDict= scrapeAudio(article)
+                bookOptions[title] = audioUrlDict
         return bookOptions
     
     except Exception as e:

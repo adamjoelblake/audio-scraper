@@ -45,18 +45,19 @@ def scrapeBookOptions():
         print("Soup created")
 
         print("Getting book options")
-        articles = main.getBookOptions(soup,bookDict)
+        # book Opitons is a dictionary stored as {Entry tile: audiofiles{index:audio file url}}
+        bookOptions = main.getBookOptions(soup,bookDict)
 
-        if not articles:
+        if not bookOptions:
             return jsonify({'error': 'No matching books found!'}), 404
         
                 
         # Cache the book options (use request session or another method for long-term storage)
-        session['options'] =  articles
+        session['options'] =  bookOptions
         session['bookDict'] = bookDict
 
         # Return book options to front end for user to choose
-        return jsonify({'bookOptions': list(articles.keys())})
+        return jsonify({'bookOptions': list(bookOptions.keys())})
         
     except Exception as e:
         return jsonify({'error': str(e)}), 500
@@ -79,8 +80,11 @@ def scrapeAudio():
             return jsonify({'error': 'Session expired or no book options available.'}), 400
         
         # Get the selected book article and scrape audio files
-        selected_article = main.chooseBook(bookOptions, selected_book_index)
-        audioFiles = main.scrapeAudio(selected_article)
+        selected_book = main.chooseBook(bookOptions, selected_book_index)
+        print(f"Selected Book: {selected_book}")
+        audioFiles = bookOptions.get(selected_book)
+        for idx, file in audioFiles.items():
+            print(f"Audio File {idx}: file")
 
         return jsonify({'audioFiles':audioFiles}), 200
 
