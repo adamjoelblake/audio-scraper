@@ -115,16 +115,15 @@ def chooseBook(options, selection_index):
 
 def scrapeAudio(article):
     try:
-        audiofiles= []
-        audioURLs= {}
+        audioUrls= {}
         audioTags = article.find_all('audio')
-        for tag in audioTags:
-            file = tag.get_text(strip=True)
-            audiofiles.append(file)
-        for idx, file in enumerate(audiofiles, start=1):
-            audioURLs[idx] = file
-            # print(f" Audio file {idx}: {audioURLs[idx]}")
-        return audioURLs
+    
+        for idx, tag in audioTags:
+            audioSrc = tag.get('src')
+            if audioSrc:
+                audioUrls[idx] = audioSrc
+                print(f"Audio file {idx}: {audioSrc}")
+        return audioUrls
     except Exception as e:
         print(f"Error in main function scrapeAudio: {e}")
 
