@@ -21,7 +21,8 @@
             document.getElementById('optionsList').innerHTML = '<li>Loading book options...</li>';
 
             // Send book title and author to the flask app
-            fetch('/scrape', {
+            fetch('https://audiobook-scraper-44c702a3d5e0.herokuapp.com/scrape', 
+            {
                 method: 'POST',
                 headers: 
                 {
@@ -63,7 +64,8 @@
         // Function to select book from options and trigger auidio scraping
         function selectBook(selection) 
         {
-            fetch('/scrape/continue', {
+            fetch('https://audiobook-scraper-44c702a3d5e0.herokuapp.com/scrape/continue', 
+            {
                 method: 'POST',
                 headers: 
                 {
