@@ -12,8 +12,9 @@ CORS(app, resources={r"/*": {"origins": "https://adamjoelblake.github.io"}},
      methods=["GET", "POST", "OPTIONS"],
      allow_headers=["Content-Type", "Authorization", "Access-Control-Allow-Credentials"])
 
-app.secret_key ='I_LOVE_READING_BOOKS'
-book_options_cache = {}
+app.config['SESSION_TYPE'] = 'filesystem'  # Can be 'filesystem', 'redis', etc.
+app.config['SESSION_PERMANENT'] = False
+app.config['SESSION_USE_SIGNER'] = True
 
 @app.route('/')
 def home():
@@ -58,7 +59,7 @@ def scrapeBookOptions():
         # Cache the book options (use request session or another method for long-term storage)
         session['options'] =  bookOptions
         session['bookDict'] = bookDict
-        app.logger.info(f"Session data size: {len(json.dumps(session))} bytes")
+
 
         # Return book options to front end for user to choose
         return jsonify({'bookOptions': list(bookOptions.keys())})
