@@ -1,4 +1,4 @@
-from flask import Flask, request, jsonify
+from flask import Flask, request, jsonify, session
 from flask_cors import CORS
 import main
 
@@ -11,6 +11,7 @@ CORS(app, resources={r"/*": {"origins": "https://adamjoelblake.github.io"}},
      methods=["GET", "POST", "OPTIONS"],
      allow_headers=["Content-Type", "Authorization", "Access-Control-Allow-Credentials"])
 
+app.secret_key ='I_LOVE_READING_BOOKS'
 book_options_cache = {}
 
 @app.route('/')
@@ -45,15 +46,14 @@ def scrapeBookOptions():
 
         print("Getting book options")
         articles = main.getBookOptions(soup,bookDict)
-        print(f"Found articles: {articles}")
 
         if not articles:
             return jsonify({'error': 'No matching books found!'}), 404
         
                 
         # Cache the book options (use request session or another method for long-term storage)
-        book_options_cache['options'] =  articles
-        book_options_cache['bookDict'] = bookDict
+        session['options'] =  articles
+        session['bookDict'] = bookDict
 
         # Return book options to front end for user to choose
         return jsonify({'bookOptions': list(articles.keys())})
@@ -70,10 +70,10 @@ def scrapeAudio():
         print(f"Selected book index: {selected_book_index}")
         
         # retrieved cached book options
-        bookOptions = book_options_cache.get('options')
-        print(f"Cached book options: {bookOptions}")
-        bookDict = book_options_cache.get('bookDict')
-        print(f"Cached bookDict: {bookDict}")
+        bookOptions = session.get('options')
+        print(f"Session book options: {bookOptions}")
+        bookDict = session.get('bookDict')
+        print(f"Session bookDict: {bookDict}")
 
         if not bookOptions or not bookDict:
             return jsonify({'error': 'Session expired or no book options available.'}), 400
