@@ -35,10 +35,17 @@ def scrapeBookOptions():
 
     
         # First half of main function
+        print(f"Calling getQueryUrl with {bookDict}")
         queryUrl = main.getQueryUrl(bookDict)
         print(f"Query URL: {queryUrl}")
+
+        print("Calling cookSoup")
         soup = main.cookSoup(queryUrl)
+        print("Soup created")
+
+        print("Getting book options")
         articles = main.getBookOptions(soup,bookDict)
+        print(f"Found articles: {articles}")
 
         if not articles:
             return jsonify({'error': 'No matching books found!'}), 404
