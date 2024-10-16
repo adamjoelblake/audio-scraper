@@ -70,6 +70,7 @@ def cookSoup(url):
 
 def getBookOptions(soup,bookDict):
     try:
+        print("starting getBookOptions function")
         bookOptions = {}
         userTitle = bookDict.get('title').lower()
         articles = soup.find('section', id='content').find_all('article')
@@ -79,7 +80,8 @@ def getBookOptions(soup,bookDict):
             if userTitle in cleanTitle:
                 audioUrlDict= scrapeAudio(article)
                 bookOptions[title] = audioUrlDict
-        print(f"bookOptions retrieved in main function: {bookOptions}")
+        for item in list(bookOptions.keys()):
+            print(item)
         return bookOptions
     
     except Exception as e:
