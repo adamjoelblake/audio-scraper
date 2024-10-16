@@ -6,15 +6,23 @@ import main
 # Initialize the Flask application
 app = Flask(__name__)
 
+# Secret key for signing the session data
+app.secret_key = 'I_LOVE_READING_BOOKS'
+
+# Session configuration for server-side storage
+app.config['SESSION_TYPE'] = 'filesystem'  # Can be 'filesystem', 'redis', etc.
+app.config['SESSION_PERMANENT'] = False
+app.config['SESSION_USE_SIGNER'] = True
+
+# Initialize session
+Session(app)
+
 # Enable CORS for all routes
 CORS(app, resources={r"/*": {"origins": "https://adamjoelblake.github.io"}},
      supports_credentials=True, 
      methods=["GET", "POST", "OPTIONS"],
      allow_headers=["Content-Type", "Authorization", "Access-Control-Allow-Credentials"])
 
-app.config['SESSION_TYPE'] = 'filesystem'  # Can be 'filesystem', 'redis', etc.
-app.config['SESSION_PERMANENT'] = False
-app.config['SESSION_USE_SIGNER'] = True
 
 @app.route('/')
 def home():
