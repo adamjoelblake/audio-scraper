@@ -6,11 +6,10 @@ import main
 app = Flask(__name__)
 
 # Enable CORS for all routes
-CORS(app, resources={r"/*": {
-    "origins": "https://adamjoelblake.github.io",
-    "methods": ["GET", "POST", "OPTIONS"],
-    "allow_headers": ["Content-Type"]
-}})
+CORS(app, resources={r"/*": {"origins": "https://adamjoelblake.github.io"}},
+     supports_credentials=True, 
+     methods=["GET", "POST", "OPTIONS"],
+     allow_headers=["Content-Type", "Authorization", "Access-Control-Allow-Credentials"])
 
 book_options_cache = {}
 
@@ -23,7 +22,7 @@ def home():
 def scrapeBookOptions():
     if request.method == 'OPTIONS':
         # Return 200 for preflight OPTIONS requests
-        return '', 200
+        return jsonify({'status': 'preflight'}), 200
     
     # Get user input
     data = request.json
