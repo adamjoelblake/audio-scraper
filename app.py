@@ -64,13 +64,16 @@ def scrapeBookOptions():
 # Second route: Accept user's book selection and scrape audio (Second half of main)
 @app.route('/scrape/continue', methods=['POST'])
 def scrapeAudio():
-    data = request.json
-    selected_book_index = int(data.get('selection'))
-
     try:
+        data = request.json
+        selected_book_index = int(data.get('selection'))
+        print(f"Selected book index: {selected_book_index}")
+        
         # retrieved cached book options
         bookOptions = book_options_cache.get('options')
+        print(f"Cached book options: {bookOptions}")
         bookDict = book_options_cache.get('bookDict')
+        print(f"Cached bookDict: {bookDict}")
 
         if not bookOptions or not bookDict:
             return jsonify({'error': 'Session expired or no book options available.'}), 400

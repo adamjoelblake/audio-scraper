@@ -104,6 +104,7 @@ def chooseBook(options, selection_index):
     try:
         titleOptions = list(options.keys())
         selected_title = titleOptions[selection_index - 1]
+        print(f"Selected Option: {selected_title}")
         return options[selected_title]
     except Exception as e:
         print(f"Error in main function chooseBook: {e}")
@@ -118,6 +119,7 @@ def scrapeAudio(article):
             audiofiles.append(file)
         for idx, file in enumerate(audiofiles, start=1):
             audioURLs[idx] = file
+            print(f" Audio file {idx}: {audioURLs[idx]}")
         return audioURLs
     except Exception as e:
         print(f"Error in main function scrapeAudio: {e}")
