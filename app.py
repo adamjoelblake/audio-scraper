@@ -84,7 +84,7 @@ def scrapeAudio():
         print(f"Selected Book: {selected_book}")
         audioFiles = bookOptions.get(selected_book)
         for idx, file in audioFiles.items():
-            print(f"Audio File {idx}: file")
+            print(f"Audio File {idx}: {file}")
 
         return jsonify({'audioFiles':audioFiles}), 200
 
