@@ -4,6 +4,8 @@
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>Audiobook Scraper</title>
+
+    <link rel="stylesheet" href="style.css">
     <script>
         // Function to handle the book search form submission
         function searchBooks(event) 
@@ -85,6 +87,10 @@
                     audioFiles = data.audioFiles;
                     bookTitle = data.bookTitle.replace(/\s+/g, '_');  // Replace spaces with underscores for file names
 
+                    // Remove book list
+                    const bookList = document.getElementById('optionsList');
+                    optionsList.style.display = 'none';
+
                     // Download button
                     const downloadButton = document.getElementById('downloadButton');
                     downloadButton.style.display = 'block';
@@ -126,7 +132,7 @@
         <button type="submit">Search Books</button>
     </form>
 
-    <h2>Book Options</h2>
+    <h2 id="optionsHeader">Book Options</h2>
     <ul id="optionsList">
         <!-- Options will be dynamically added here-->
     </ul>
