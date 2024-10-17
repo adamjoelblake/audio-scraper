@@ -1,9 +1,12 @@
-from flask import Flask, request, jsonify, session
+from flask import Flask, request, jsonify, session, send_file
 from flask_session import Session
 from flask_cors import CORS
 from redis import Redis
+import zipfile
+from io import BytesIO
 import os
 import main
+import requests
 
 # Initialize the Flask application
 app = Flask(__name__)
@@ -108,6 +111,7 @@ def scrapeAudio():
         
         # return audio files to front end
         audioFiles = main.chooseBook(bookOptions, selected_book_index)
+        session['audioFiles'] = audioFiles
         for idx, file in audioFiles.items():
             print(f"Audio File {idx}: {file}")
 
@@ -118,6 +122,36 @@ def scrapeAudio():
 
     except Exception as e:
         return jsonify({'error':str(e)}), 500
+
+# Third route: Download the file from the external source and send it to the client
+@app.route('/download_all', methods=['GET'])
+def download_audio(file_index):
+    try:
+        bookTitle = session.get('bookDict').get('title')
+        audioFiles = session.get('audioFiles')
+
+        # Create a zip file in memory
+        zip_buffer = BytesIO()
+
+        # Create a zip file in memory
+        with zipfile.ZipFile(zip_buffer, 'w', zipfile.ZIP_DEFLATED) as zip_file:
+            for index, file_url in audioFiles.items():
+                #download each audio file
+                response = requests.get(file_url)
+                if response.status_code != 200:
+                    return jsonify({'error':f'Failed to download audio file {index}'}), 500
+                
+                # Add downloaded content to ZIP
+                zip_file.writestr(f"{bookTitle}_{index}.mp3")
+
+        # Ensure the ZIP buffer is set at the beginning of the stream
+        zip_buffer.seek(0)
+
+        # Send the ZIP file as a downloadable attachment
+        return send_file(zip_buffer, download_name=f"{bookTitle}_audiobook.zip", as_attachment=True)
+
+    except Exception as e:
+        return jsonify({'error': str(e)}), 500
 
 if __name__ == '__main__':
     app.run(debug=True)

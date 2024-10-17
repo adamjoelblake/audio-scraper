@@ -102,49 +102,13 @@
 
         function downloadAudioFiles()
         {
-            if (Object.keys(audioFiles).length ===0)
-            {
-                alert('No audio files available for download.');
-                return;
-            }
-
-            let delay = 0;
-            // Automatically download each audio file
-            Object.entries(audioFiles).forEach(([index,fileUrl]) => 
-            {
-                const httpsUrl = fileUrl.replace('http://', 'https://');
-                setTimeout(() => 
-                {
-                    // Use fetch API to force the download
-                    fetch(httpsUrl)
-                    .then(response => 
-                    {
-                        if (!response.ok)
-                        {
-                            throw new Error('Network response was not ok');
-                        }
-                        return response.blob(); // Get the file as a blob
-                    })
-                    .then(blob => 
-                    {
-                        const link = document.createElement('a');
-                        link.href = URL.createObjectURL(blob);  // Create a local URL for the blob
-                        link.download = `${bookTitle}_${index}.mp3`;
-                        document.body.appendChild(link);
-                        link.click();  // Trigger the download
-                        document.body.removeChild(link);  // Remove the link after triggering the download
-                        URL.revokeObjectURL(link.href);  // Clean up the blob URL
-                    })
-                    .catch(error => console.error('Error downloading fild:', error));
-                }, delay);
-
-                delay += 500;
-            });
-
-            setTimeout(() => 
-            {
-                alert(`All files for "${bookTitle}" have been downloaded.`)
-            }, delay + 500)
+            // Trigger single request to download the ZIP
+            const link = document.createElement('a');
+            link.href = 'https://audiobook-scraper-44c702a3d5e0.herokuapp.com/download_all';
+            link.download = `${bookTitle}_audiobook.zip`;
+            document.body.appendChild(link);
+            link.click();
+            document.body.removeChild(link);
         }
     </script>
 </head>
