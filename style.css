@@ -1,4 +1,9 @@
 
+body 
+{
+    background-color: darkslategrey;
+}
+
 #optionsHeader 
 {
     display:none;
