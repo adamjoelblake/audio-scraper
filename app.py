@@ -142,7 +142,7 @@ def download_audio():
                     return jsonify({'error':f'Failed to download audio file {index}'}), 500
                 
                 # Add downloaded content to ZIP
-                zip_file.writestr(f"{bookTitle}_{index}.mp3")
+                zip_file.writestr(f"{bookTitle}_{index}.mp3", response.content)
 
         # Ensure the ZIP buffer is set at the beginning of the stream
         zip_buffer.seek(0)
