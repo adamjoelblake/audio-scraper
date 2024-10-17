@@ -117,11 +117,13 @@ def scrapeAudio(article):
     try:
         audioUrls= {}
         audioTags = article.find_all('audio')
-    
-        for idx, tag in audioTags:
+
+        count = 1
+        for tag in audioTags:
             url = tag.get_text(strip=True)
-            audioUrls[idx] = url
-        
+            audioUrls[count] = url
+            count += 1
+
         for idx, url in audioUrls.items():
             print(f"{idx}: {url}")
         return audioUrls
