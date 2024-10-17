@@ -5,29 +5,39 @@
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>Audiobook Scraper</title>
 
+    <!-- CSS -->
     <link rel="stylesheet" href="style.css">
+    <!-- Bootstrap CSS -->
+    <link href="https://stackpath.bootstrapcdn.com/bootstrap/4.5.2/css/bootstrap.min.css" rel="stylesheet">
+
+    <!-- Bootstrap JS (Optional if you need Bootstrap components like modals or dropdowns) -->
+    <script src="https://stackpath.bootstrapcdn.com/bootstrap/4.5.2/js/bootstrap.bundle.min.js"></script>
     <script src="script.js"></script>
 </head>
-<body>
-    <h1>Audiobook Scraper</h1>
+<body class="container mt-5">
+    <h1 class="text-center mb-4">Audiobook Scraper</h1>
 
     <!-- Form to submit book title and author -->
-    <form id="searchForm" onsubmit="searchBooks(event)">
-        <label for="title">Book Title: </label>
-        <input type="text" id="title" name="title" required><br>
+    <form id="searchForm" onsubmit="searchBooks(event)" class="mb-4">
+        <div class="form-group">
+            <label for="title">Book Title: </label>
+            <input type="text" id="title" name="title" class="form-control" required>
+        </div>
 
-        <label for="author">Author: </label>
-        <input type="text" id="author" name="author"><br>
+        <div class="form-group">
+            <label for="author">Author: </label>
+            <input type="text" id="author" name="author"><br>
+        </div>
 
-        <button type="submit">Search Books</button>
+        <button type="submit" class="btn btn-primary">Search Books</button>
     </form>
 
-    <h2 id="optionsHeader">Book Options</h2>
-    <ul id="optionsList">
+    <h2 id="optionsHeader" class="mb-3">Book Options</h2>
+    <ul id="optionsList" class="list-unstyled">
         <!-- Options will be dynamically added here-->
     </ul>
 
     <!-- Hidden button for downloading files -->
-    <button id="downloadButton" style="display:none;" onclick="downloadAudioFiles()">Download</button>
+    <button id="downloadButton" class="btn btn-success mt-3" onclick="downloadAudioFiles()">Download</button>
 </body>
 </html>
