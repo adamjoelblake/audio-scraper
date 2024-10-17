@@ -106,10 +106,8 @@ def scrapeAudio():
         if not bookOptions or not bookDict:
             return jsonify({'error': 'Session expired or no book options available.'}), 400
         
-        # Get the selected book article and scrape audio files
-        selected_book = main.chooseBook(bookOptions, selected_book_index)
-        print(f"Selected Book: {selected_book}")
-        audioFiles = bookOptions.get(selected_book)
+        # return audio files to front end
+        audioFiles = main.chooseBook(bookOptions, selected_book_index)
         for idx, file in audioFiles.items():
             print(f"Audio File {idx}: {file}")
 
