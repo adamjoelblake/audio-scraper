@@ -107,6 +107,7 @@ def scrapeAudio():
         print(f"Session bookDict: {bookDict}")
 
         if not bookOptions or not bookDict:
+            print("Session expired or no book options available")
             return jsonify({'error': 'Session expired or no book options available.'}), 400
         
         # return audio files to front end
@@ -121,6 +122,7 @@ def scrapeAudio():
             }), 200
 
     except Exception as e:
+        print(f"Error: {str(e)}")
         return jsonify({'error':str(e)}), 500
 
 # Third route: Download the file from the external source and send it to the client

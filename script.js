@@ -66,6 +66,10 @@ function searchBooks(event)
 // Function to select book from options and trigger auidio scraping
 function selectBook(selection) 
 {
+    let alertShown = false;
+
+    console.log('Selection made:', selection);
+
     fetch('https://audiobook-scraper-44c702a3d5e0.herokuapp.com/scrape/continue', 
     {
         method: 'POST',
@@ -81,8 +85,12 @@ function selectBook(selection)
     .then(response => response.json())
     .then(data => 
     {
+        console.log('Response data: ', data)
+
         if(data.audioFiles)
         {
+            console.log('Audio files found: ', data.audioFiles);
+
             audioFiles = data.audioFiles;
             bookTitle = data.bookTitle.replace(/\s+/g, '_');  // Replace spaces with underscores for file names
 
@@ -101,8 +109,9 @@ function selectBook(selection)
 
         }
 
-        else 
+        else if (!alertShown)
         {
+            console.log('No audio files found');
             alert('No audio files found')
             alertShown = true;
         }
@@ -122,7 +131,7 @@ function selectBook(selection)
             document.getElementById('downloadButton').textContent = `Download ${bookTitle}`;
         }
 
-        else
+        else if (!alertShown)
         {
             alert('No audio files found!')
             alertShown = true;
