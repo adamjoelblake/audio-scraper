@@ -108,34 +108,42 @@
                 return;
             }
 
+            let delay = 0;
             // Automatically download each audio file
             Object.entries(audioFiles).forEach(([index,fileUrl]) => 
             {
-                // Use fetch API to force the download
-                fetch(fileUrl)
-                .then(response => 
+                setTimeout(() => 
                 {
-                    if (!response.ok)
+                    // Use fetch API to force the download
+                    fetch(fileUrl)
+                    .then(response => 
                     {
-                        throw new Error('Network response was not ok');
-                    }
-                    return response.blob(); // Get the file as a blob
-                })
-                .then(blob => 
-                {
-                    const link = document.createElement('a');
-                    link.href = URL.createObjectURL(blob);  // Create a local URL for the blob
-                    link.download = `${bookTitle}_${index}.mp3`;
-                    document.body.appendChild(link);
-                    link.click();  // Trigger the download
-                    document.body.removeChild(link);  // Remove the link after triggering the download
-                    URL.revokeObjectURL(link.href);  // Clean up the blob URL
-                })
+                        if (!response.ok)
+                        {
+                            throw new Error('Network response was not ok');
+                        }
+                        return response.blob(); // Get the file as a blob
+                    })
+                    .then(blob => 
+                    {
+                        const link = document.createElement('a');
+                        link.href = URL.createObjectURL(blob);  // Create a local URL for the blob
+                        link.download = `${bookTitle}_${index}.mp3`;
+                        document.body.appendChild(link);
+                        link.click();  // Trigger the download
+                        document.body.removeChild(link);  // Remove the link after triggering the download
+                        URL.revokeObjectURL(link.href);  // Clean up the blob URL
+                    })
+                    .catch(error => console.error('Error downloading fild:', error));
+                }, delay);
 
-
+                delay += 500;
             });
 
-            alert(`All files for "${bookTitle}" have been downloaded.`)
+            setTimeout(() => 
+            {
+                alert(`All files for "${bookTitle}" have been downloaded.`)
+            }, delay + 500)
         }
     </script>
 </head>
