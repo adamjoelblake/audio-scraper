@@ -1,7 +1,7 @@
 
 body 
 {
-    background-color:darkgrey;
+    background-color:darkgrey !important;
 }
 
 #optionsHeader 
