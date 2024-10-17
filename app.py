@@ -22,7 +22,7 @@ app.config['SESSION_PERMANENT'] = False
 app.config['SESSION_USE_SIGNER'] = True
 app.config['SESSION_KEY_PREFIX'] = 'audiobook-scraper-session:'
 app.config['PERMANENT_SESSION_LIFETIME'] = 3600  # Sessions expire in 1 hour
-app.config['SESSION_COOKIE_SAMESITE'] = 'None'
+app.config['SESSION_COOKIE_SAMESITE'] = 'Lax'
 app.config['SESSION_COOKIE_SECURE'] = True
 
 try:
