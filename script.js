@@ -14,6 +14,7 @@ function searchBooks(event)
     searchButton.disabled = true;
 
     // Loading options message
+    document.getElementById('optionsHeader').style.display = 'block';
     document.getElementById('optionsList').innerHTML = '<li>Loading book options...</li>';
 
     // Send book title and author to the flask app
@@ -82,8 +83,8 @@ function selectBook(selection)
             bookTitle = data.bookTitle.replace(/\s+/g, '_');  // Replace spaces with underscores for file names
 
             // Remove book list
-            const bookList = document.getElementById('optionsList');
-            optionsList.style.display = 'none';
+            document.getElementById('optionsHeader').style.display = 'none';
+            document.getElementById('optionsList').style.display = 'none';
 
             // Download button
             const downloadButton = document.getElementById('downloadButton');
