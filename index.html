@@ -112,10 +112,11 @@
             // Automatically download each audio file
             Object.entries(audioFiles).forEach(([index,fileUrl]) => 
             {
+                const httpsUrl = fileUrl.replace('http://', 'https://');
                 setTimeout(() => 
                 {
                     // Use fetch API to force the download
-                    fetch(fileUrl)
+                    fetch(httpsUrl)
                     .then(response => 
                     {
                         if (!response.ok)
