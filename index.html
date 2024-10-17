@@ -82,19 +82,14 @@
             {
                 if(data.audioFiles)
                 {
-                    const audioFiles = data.audioFiles;
-                    const bookTitle = data.bookTitle.replace(/\s+/g, '_');  // Replace spaces with underscores for file names
+                    audioFiles = data.audioFiles;
+                    bookTitle = data.bookTitle.replace(/\s+/g, '_');  // Replace spaces with underscores for file names
 
-                    // Automatically download each audio file
-                    Object.entries(audioFiles).forEach(([index,fileUrl]) => 
-                    {
-                        const link = document.createElement('a');
-                        link.href = fileUrl;
-                        link.download = `${bookTitle}_${index}.mp3`;
-                        document.body.appendChild(link);
-                        link.click();
-                        document.body.removeChild(link);
-                    });
+                    // Download button
+                    const downloadButton = document.getElementById('downloadButton');
+                    downloadButton.style.display = 'block';
+                    downloadButton.textContent = `Download ${bookTitle}`;
+
                 }
 
                 else 
@@ -103,6 +98,28 @@
                 }
             })
             .catch(error => console.error('Error: ', error));
+        }
+
+        function downloadAudioFiles()
+        {
+            if (Object.keys(audioFiles).length ===0)
+            {
+                alert('No audio files available for download.');
+                return;
+            }
+
+            // Automatically download each audio file
+            Object.entries(audioFiles).forEach(([index,fileUrl]) => 
+            {
+                const link = document.createElement('a');
+                link.href = fileUrl;
+                link.download = `${bookTitle}_${index}.mp3`;
+                document.body.appendChild(link);
+                link.click();
+                document.body.removeChild(link);
+            });
+
+            alert(`All files for "${bookTitle}" have been downloaded.`)
         }
     </script>
 </head>
@@ -124,5 +141,8 @@
     <ul id="optionsList">
         <!-- Options will be dynamically added here-->
     </ul>
+
+    <!-- Hidden button for downloading files -->
+    <button id="downloadButton" style="display:none;" onclick="downloadAudioFiles()">Download</button>
 </body>
 </html>
