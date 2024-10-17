@@ -44,6 +44,10 @@ function searchBooks(event)
                 listItem.innerHTML = `<button onclick="selectBook(${index + 1})">${option}</button>`;
                 optionsList.appendChild(listItem);
             });
+
+            // Store info locally as a fallback
+            localStorage.setItem('bookOptions', JSON.stringify(bookOptions));
+            localStorage.setItem('bookDict', JSON.stringify({title: title, author: author}));
         } 
         else
         {
@@ -82,6 +86,10 @@ function selectBook(selection)
             audioFiles = data.audioFiles;
             bookTitle = data.bookTitle.replace(/\s+/g, '_');  // Replace spaces with underscores for file names
 
+            // Local storage as fall back
+            localStorage.setItem('audioFiles',JSON.stringify(audioFiles));
+            localStorage.setItem('selectedBook', bookTitle);
+
             // Remove book list
             document.getElementById('optionsHeader').style.display = 'none';
             document.getElementById('optionsList').style.display = 'none';
@@ -96,9 +104,30 @@ function selectBook(selection)
         else 
         {
             alert('No audio files found')
+            alertShown = true;
         }
     })
-    .catch(error => console.error('Error: ', error));
+    .catch(error => 
+    {
+        console.error('Error: ', error);
+
+        // If session failed, fall back to localStorage
+        const storedAudioFiles = localStorage.getItem('audioFiles');
+        const storedBookTitle = localStorage.getItem('selectedBook');
+        if (storedAudioFiles && storedBookTitle)
+        {
+            audioFiles = JSON.parse(storedAudioFiles);
+            bookTitle = storedBookTitle;
+            document.getElementById('downloadButton').style.display = 'block';
+            document.getElementById('downloadButton').textContent = `Download ${bookTitle}`;
+        }
+
+        else
+        {
+            alert('No audio files found!')
+            alertShown = true;
+        }
+    })
 }
 
 function downloadAudioFiles()
