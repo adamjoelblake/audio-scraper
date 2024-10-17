@@ -36,7 +36,7 @@ except Exception as e:
 Session(app)
 
 # Enable CORS for all routes
-CORS(app, resources={r"/*": {"origins": "https://adamjoelblake.github.io"}},
+CORS(app, resources={r"/*": {"origins": "*"}},
      supports_credentials=True, 
      methods=["GET", "POST", "OPTIONS"],
      allow_headers=["Content-Type", "Authorization", "Access-Control-Allow-Credentials"])
