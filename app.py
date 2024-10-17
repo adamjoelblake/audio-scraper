@@ -111,7 +111,10 @@ def scrapeAudio():
         for idx, file in audioFiles.items():
             print(f"Audio File {idx}: {file}")
 
-        return jsonify({'audioFiles':audioFiles}), 200
+        return jsonify({
+            'audioFiles':audioFiles,
+            'bookTitle':bookDict['title']
+            }), 200
 
     except Exception as e:
         return jsonify({'error':str(e)}), 500
