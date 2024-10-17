@@ -1,6 +1,7 @@
 from flask import Flask, request, jsonify, session
 from flask_session import Session
 from flask_cors import CORS
+import os
 import main
 
 # Initialize the Flask application
@@ -13,6 +14,8 @@ app.secret_key = 'I_LOVE_READING_BOOKS'
 app.config['SESSION_TYPE'] = 'filesystem'  # Can be 'filesystem', 'redis', etc.
 app.config['SESSION_PERMANENT'] = False
 app.config['SESSION_USE_SIGNER'] = True
+app.config['SESSION_FILE_DIR'] = './flask_session/'
+app.config['SESSION_TYPE'] = 'filesystem'
 
 # Initialize session
 Session(app)
@@ -57,7 +60,7 @@ def scrapeBookOptions():
         print("Getting book options")
         # book Opitons is a dictionary stored as {Entry tile: audiofiles{index:audio file url}}
         bookOptions = main.getBookOptions(soup,bookDict)
-        print(f"bookOptions function call successful: {bookOptions}")
+        print(f"bookOptions function call successful")
 
         if not bookOptions:
             return jsonify({'error': 'No matching books found!'}), 404
@@ -65,6 +68,8 @@ def scrapeBookOptions():
         # Cache the book options (use request session or another method for long-term storage)
         session['options'] =  bookOptions
         session['bookDict'] = bookDict
+        print(os.path.abspath(app.config['SESSION_FILE_DIR']))
+        print(f"Session after setting: {dict(session)}")
 
 
         # Return book options to front end for user to choose
