@@ -111,12 +111,28 @@
             // Automatically download each audio file
             Object.entries(audioFiles).forEach(([index,fileUrl]) => 
             {
-                const link = document.createElement('a');
-                link.href = fileUrl;
-                link.download = `${bookTitle}_${index}.mp3`;
-                document.body.appendChild(link);
-                link.click();
-                document.body.removeChild(link);
+                // Use fetch API to force the download
+                fetch(fileUrl)
+                .then(response => 
+                {
+                    if (!response.ok)
+                    {
+                        throw new Error('Network response was not ok');
+                    }
+                    return response.blob(); // Get the file as a blob
+                })
+                .then(blob => 
+                {
+                    const link = document.createElement('a');
+                    link.href = URL.createObjectURL(blob);  // Create a local URL for the blob
+                    link.download = `${bookTitle}_${index}.mp3`;
+                    document.body.appendChild(link);
+                    link.click();  // Trigger the download
+                    document.body.removeChild(link);  // Remove the link after triggering the download
+                    URL.revokeObjectURL(link.href);  // Clean up the blob URL
+                })
+
+
             });
 
             alert(`All files for "${bookTitle}" have been downloaded.`)
