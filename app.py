@@ -125,7 +125,7 @@ def scrapeAudio():
 
 # Third route: Download the file from the external source and send it to the client
 @app.route('/download_all', methods=['GET'])
-def download_audio(file_index):
+def download_audio():
     try:
         bookTitle = session.get('bookDict').get('title')
         audioFiles = session.get('audioFiles')
