@@ -19,6 +19,15 @@ app.config['SESSION_PERMANENT'] = False
 app.config['SESSION_USE_SIGNER'] = True
 app.config['SESSION_KEY_PREFIX'] = 'audiobook-scraper-session:'
 app.config['PERMANENT_SESSION_LIFETIME'] = 3600  # Sessions expire in 1 hour
+app.config['SESSION_COOKIE_SAMESITE'] = 'None'
+app.config['SESSION_COOKIE_SECURE'] = True
+
+try:
+    redis_conn = Redis.from_url(redis_url)
+    redis_conn.ping()  # This sends a ping to verify Redis is connected
+    print("Redis connection successful")
+except Exception as e:
+    print(f"Redis connection error: {e}")
 
 # Initialize session
 Session(app)
@@ -71,7 +80,7 @@ def scrapeBookOptions():
         # Cache the book options (use request session or another method for long-term storage)
         session['options'] =  bookOptions
         session['bookDict'] = bookDict
-        print(f"Session after setting: {dict(session)}")
+        #print(f"Session after setting: {dict(session)}")
 
 
         # Return book options to front end for user to choose
