@@ -1,6 +1,7 @@
 from flask import Flask, request, jsonify, session
 from flask_session import Session
 from flask_cors import CORS
+from redis import Redis
 import os
 import main
 
@@ -11,11 +12,13 @@ app = Flask(__name__)
 app.secret_key = 'I_LOVE_READING_BOOKS'
 
 # Session configuration for server-side storage
-app.config['SESSION_TYPE'] = 'filesystem'  # Can be 'filesystem', 'redis', etc.
+redis_url = os.environ.get('REDISCLOUD_URL', 'redis://localhost:6379')  # Default to localhost if Redis URL isn't available
+app.config['SESSION_TYPE'] = 'redis'
+app.config['SESSION_REDIS'] = Redis.from_url(redis_url)
 app.config['SESSION_PERMANENT'] = False
 app.config['SESSION_USE_SIGNER'] = True
-app.config['SESSION_FILE_DIR'] = './flask_session/'
-app.config['SESSION_TYPE'] = 'filesystem'
+app.config['SESSION_KEY_PREFIX'] = 'audiobook-scraper-session:'
+app.config['PERMANENT_SESSION_LIFETIME'] = 3600  # Sessions expire in 1 hour
 
 # Initialize session
 Session(app)
@@ -68,7 +71,6 @@ def scrapeBookOptions():
         # Cache the book options (use request session or another method for long-term storage)
         session['options'] =  bookOptions
         session['bookDict'] = bookDict
-        print(os.path.abspath(app.config['SESSION_FILE_DIR']))
         print(f"Session after setting: {dict(session)}")
 
 
