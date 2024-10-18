@@ -38,10 +38,9 @@ function searchBooks(event)
             const optionsList = document.getElementById('optionsList')
             optionsList.innerHTML = ''; // Clears any options from previous searches
 
-            // Populate book options for user to choose from
-            bookOptions.forEach((option, index) => {
+            Object.keys(bookOptions).forEach((option, index) => {
                 const listItem = document.createElement('li');
-                listItem.innerHTML = `<button onclick="selectBook(${index + 1})">${option}</button>`;
+                listItem.innerHTML = `<button onclick="selectBook(${index})">${option}</button>`;
                 optionsList.appendChild(listItem);
             });
 
