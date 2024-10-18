@@ -86,7 +86,9 @@ def scrapeBookOptions():
         session['bookDict'] = bookDict
         print(f"Session bookDict: {session['bookDict']}")
         #print(f"Session after setting: {dict(session)}")
-        print(redis_conn.get('audiobook-scraper-session:' + session.sid))
+        session.modified = True
+        session_key = app.session_interface.get_session(app, request).sid
+        print(redis_conn.get(f'audiobook-scraper-session:{session_key}'))
 
 
         # Return book options to front end for user to choose
