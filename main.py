@@ -70,7 +70,6 @@ def cookSoup(url):
 
 def getBookOptions(soup,bookDict):
     try:
-        print("starting getBookOptions function")
         bookOptions = {}
         userTitle = bookDict.get('title').lower()
         articles = soup.find('section', id='content').find_all('article')
@@ -80,6 +79,7 @@ def getBookOptions(soup,bookDict):
             if userTitle in cleanTitle:
                 audioUrlDict= scrapeAudio(article)
                 bookOptions[title] = audioUrlDict
+                print(f"Book Option Entry: {bookOptions[title]}")
         return bookOptions
     
     except Exception as e:
@@ -121,9 +121,6 @@ def scrapeAudio(article):
             url = tag.get_text(strip=True)
             audioUrls[count] = url
             count += 1
-
-        for idx, url in audioUrls.items():
-            print(f"{idx}: {url}")
         return audioUrls
     except Exception as e:
         print(f"Error in main function scrapeAudio: {e}")
