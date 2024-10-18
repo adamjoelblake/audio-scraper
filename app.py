@@ -122,6 +122,11 @@ def scrapeAudio():
         # Print session data for debugging
         print(f"Session Audio Files: {session['audioFiles']}")
         print(f"Session Book Dict: {session['bookDict']}")
+        
+        # Redis debugging: Inspect Redis session storage
+        redis_key = f"audiobook-scraper-session:{session.sid}"
+        redis_data = redis_conn.get(redis_key)
+        print(f"Redis session data: {redis_data}")
 
         return jsonify({
             'audioFiles':audioFiles,
@@ -142,7 +147,7 @@ def download_audio():
         print(f"Session Book Dict: {bookDict}")
         print(f"Session Audio Files: {audioFiles}")
         
-        if not bookDict or audioFiles:
+        if not bookDict or not audioFiles:
             return jsonify({'error': 'Audio files or bookDict missing from session'}), 400
         
         for file in audioFiles:
@@ -160,13 +165,13 @@ def download_audio():
                     return jsonify({'error':f'Failed to download audio file {index}'}), 500
                 
                 # Add downloaded content to ZIP
-                zip_file.writestr(f"{bookDict['bookTitle']}_{index}.mp3", response.content)
+                zip_file.writestr(f"{bookDict['title']}_{index}.mp3", response.content)
 
         # Ensure the ZIP buffer is set at the beginning of the stream
         zip_buffer.seek(0)
 
         # Send the ZIP file as a downloadable attachment
-        return send_file(zip_buffer, download_name=f"{bookDict['bookTitle']}_audiobook.zip", as_attachment=True)
+        return send_file(zip_buffer, download_name=f"{bookDict['title']}_audiobook.zip", as_attachment=True)
 
     except Exception as e:
         return jsonify({'error': str(e)}), 500
