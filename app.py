@@ -82,7 +82,9 @@ def scrapeBookOptions():
         
         # Cache the book options (use request session or another method for long-term storage)
         session['options'] =  bookOptions
+        print(f"Session options: {session['options']}")
         session['bookDict'] = bookDict
+        print(f"Session bookDict: {session['bookDict']}")
         #print(f"Session after setting: {dict(session)}")
 
 
