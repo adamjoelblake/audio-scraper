@@ -23,7 +23,7 @@ app.config['SESSION_USE_SIGNER'] = True
 app.config['SESSION_KEY_PREFIX'] = 'audiobook-scraper-session:'
 app.config['PERMANENT_SESSION_LIFETIME'] = 3600  # Sessions expire in 1 hour
 app.config['SESSION_COOKIE_SAMESITE'] = 'Lax'
-app.config['SESSION_COOKIE_SECURE'] = False
+app.config['SESSION_COOKIE_SECURE'] = True
 
 try:
     redis_conn = Redis.from_url(redis_url)
@@ -86,9 +86,6 @@ def scrapeBookOptions():
         session['bookDict'] = bookDict
         print(f"Session bookDict: {session['bookDict']}")
         #print(f"Session after setting: {dict(session)}")
-        session.modified = True
-        session_key = app.session_interface.get_session(app, request).sid
-        print(redis_conn.get(f'audiobook-scraper-session:{session_key}'))
 
 
         # Return book options to front end for user to choose
