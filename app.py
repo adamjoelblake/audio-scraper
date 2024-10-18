@@ -137,7 +137,6 @@ def scrapeAudio():
 def download_audio():
     try:
         bookDict = session.get('bookDict')
-        bookTitle = bookDict.get('title')
         audioFiles = session.get('audioFiles')
 
         print(f"Session Book Dict: {bookDict}")
@@ -161,13 +160,13 @@ def download_audio():
                     return jsonify({'error':f'Failed to download audio file {index}'}), 500
                 
                 # Add downloaded content to ZIP
-                zip_file.writestr(f"{bookTitle}_{index}.mp3", response.content)
+                zip_file.writestr(f"{bookDict['bookTitle']}_{index}.mp3", response.content)
 
         # Ensure the ZIP buffer is set at the beginning of the stream
         zip_buffer.seek(0)
 
         # Send the ZIP file as a downloadable attachment
-        return send_file(zip_buffer, download_name=f"{bookTitle}_audiobook.zip", as_attachment=True)
+        return send_file(zip_buffer, download_name=f"{bookDict['bookTitle']}_audiobook.zip", as_attachment=True)
 
     except Exception as e:
         return jsonify({'error': str(e)}), 500
