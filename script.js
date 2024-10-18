@@ -73,12 +73,23 @@ function selectBook(selection)
     const bookOptions = JSON.parse(localStorage.getItem('bookOptions'));
     const bookDict = JSON.parse(localStorage.getItem('bookDict'));
 
+    // Debugging: Log retrieved values to verify
+    console.log('bookOptions:', bookOptions);
+    console.log('bookDict:', bookDict);
+
 
     if (!bookOptions || !bookDict)
     {
         alert('Missing book options or metadata.');
         return;
     }
+
+    console.log('Sending to backend: ', { 
+        selection: selection, 
+        bookOptions: bookOptions, 
+        bookDict: bookDict 
+    });
+
     fetch('https://audiobook-scraper-44c702a3d5e0.herokuapp.com/scrape/continue', 
     {
         method: 'POST',
