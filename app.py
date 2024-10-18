@@ -103,20 +103,20 @@ def scrapeAudio():
         print(f"Selected book index: {selected_book_index}")
         
         # retrieved cached book options
-        bookOptions = session.get('options')
-        print(f"Session book options: {bookOptions}")
-        bookDict = session.get('bookDict')
-        print(f"Session bookDict: {bookDict}")
+        bookOptions = data.get('bookOptions')
+        print(f"Local book options: {bookOptions}")
+        bookDict = data.get('bookDict')
+        print(f"Local bookDict: {bookDict}")
 
         if not bookOptions or not bookDict:
-            print("Session expired or no book options available")
+            print("Local storage error")
             return jsonify({'error': 'Session expired or no book options available.'}), 400
         
         # return audio files to front end
         audioFiles = main.chooseBook(bookOptions, selected_book_index)
         session['audioFiles'] = audioFiles
-        for idx, file in audioFiles.items():
-            print(f"Audio File {idx}: {file}")
+        # for idx, file in audioFiles.items():
+        #     print(f"Audio File {idx}: {file}")
 
         return jsonify({
             'audioFiles':audioFiles,
