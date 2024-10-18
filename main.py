@@ -80,8 +80,6 @@ def getBookOptions(soup,bookDict):
             if userTitle in cleanTitle:
                 audioUrlDict= scrapeAudio(article)
                 bookOptions[title] = audioUrlDict
-        for item in list(bookOptions.keys()):
-            print(item)
         return bookOptions
     
     except Exception as e:
