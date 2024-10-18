@@ -14,14 +14,20 @@ body
     display:none;
 }
 
+#searchForm
+{
+    margin-top:0px !important;
+    padding-top:0px !important;
+}
+
 .title-image {
     display: block;
     margin: 0 auto;
     max-width: 100%; /* Make the image responsive */
     width: 500px; /* Set a specific width for larger screens */
     height: auto; /* Maintain the aspect ratio */
-    margin-bottom: 20px; /* Add some space below the image */
-    padding-top: 150px;
+    margin-bottom: 0px;
+    padding-top: 0px;
 }
 
 @media (max-width: 768px) {
