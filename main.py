@@ -79,7 +79,7 @@ def getBookOptions(soup,bookDict):
             if userTitle in cleanTitle:
                 audioUrlDict= scrapeAudio(article)
                 bookOptions[title] = audioUrlDict
-                print(f"Book Option Entry: {bookOptions[title]}")
+                # print(f"Book Option Entry: {bookOptions[title]}")
         return bookOptions
     
     except Exception as e:

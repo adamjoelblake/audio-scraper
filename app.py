@@ -77,7 +77,7 @@ def scrapeBookOptions():
         bookOptions = main.getBookOptions(soup,bookDict)
         print(f"bookOptions function call successful")
         for option in bookOptions:
-            print(option)
+            print(bookOptions[option])
 
         if not bookOptions:
             return jsonify({'error': 'No matching books found!'}), 404
