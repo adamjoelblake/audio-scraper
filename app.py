@@ -91,7 +91,7 @@ def scrapeBookOptions():
 
 
         # Return book options to front end for user to choose
-        return jsonify({'bookOptions': list(bookOptions.keys())})
+        return jsonify({'bookOptions': bookOptions})
         
     except Exception as e:
         return jsonify({'error': str(e)}), 500
