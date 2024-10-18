@@ -76,6 +76,8 @@ def scrapeBookOptions():
         # book Opitons is a dictionary stored as {Entry tile: audiofiles{index:audio file url}}
         bookOptions = main.getBookOptions(soup,bookDict)
         print(f"bookOptions function call successful")
+        for option in bookOptions:
+            print(option)
 
         if not bookOptions:
             return jsonify({'error': 'No matching books found!'}), 404
