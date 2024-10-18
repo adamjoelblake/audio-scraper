@@ -117,6 +117,7 @@ def scrapeAudio():
         # return audio files to front end
         audioFiles = main.chooseBook(bookOptions, selected_book_index)
         session['audioFiles'] = audioFiles
+        session['bookDict'] = bookDict
         
         # Print session data for debugging
         print(f"Session Audio Files: {session['audioFiles']}")
