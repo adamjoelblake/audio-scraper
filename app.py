@@ -133,8 +133,17 @@ def scrapeAudio():
 @app.route('/download_all', methods=['GET'])
 def download_audio():
     try:
-        bookTitle = session.get('bookDict').get('title')
+        bookDict = session.get('bookDict')
+        if not bookDict:
+            return jsonify({'error': 'Book information missing from session'}), 400
+        
+        bookTitle = bookDict.get('title')
+        
         audioFiles = session.get('audioFiles')
+        if not audioFiles:
+            return jsonify({'error': 'Audio files missing from session'}), 400
+        for file in audioFiles:
+            print(f"Audio file: {file}")
 
         # Create a zip file in memory
         zip_buffer = BytesIO()
