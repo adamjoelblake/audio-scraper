@@ -137,14 +137,15 @@ def scrapeAudio():
 def download_audio():
     try:
         bookDict = session.get('bookDict')
-        if not bookDict:
-            return jsonify({'error': 'Book information missing from session'}), 400
-        
         bookTitle = bookDict.get('title')
-        
         audioFiles = session.get('audioFiles')
-        if not audioFiles:
-            return jsonify({'error': 'Audio files missing from session'}), 400
+
+        print(f"Session Book Dict: {bookDict}")
+        print(f"Session Audio Files: {audioFiles}")
+        
+        if not bookDict or audioFiles:
+            return jsonify({'error': 'Audio files or bookDict missing from session'}), 400
+        
         for file in audioFiles:
             print(f"Audio file: {file}")
 
