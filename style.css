@@ -21,7 +21,7 @@ body
     width: 500px; /* Set a specific width for larger screens */
     height: auto; /* Maintain the aspect ratio */
     margin-bottom: 20px; /* Add some space below the image */
-    padding-top: 50px;
+    padding-top: 150px;
 }
 
 @media (max-width: 768px) {
