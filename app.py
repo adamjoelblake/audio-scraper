@@ -18,12 +18,12 @@ app.secret_key = 'I_LOVE_READING_BOOKS'
 redis_url = os.environ.get('REDISCLOUD_URL', 'redis://localhost:6379')  # Default to localhost if Redis URL isn't available
 app.config['SESSION_TYPE'] = 'redis'
 app.config['SESSION_REDIS'] = Redis.from_url(redis_url)
-app.config['SESSION_PERMANENT'] = False
+app.config['SESSION_PERMANENT'] = True
 app.config['SESSION_USE_SIGNER'] = True
 app.config['SESSION_KEY_PREFIX'] = 'audiobook-scraper-session:'
 app.config['PERMANENT_SESSION_LIFETIME'] = 3600  # Sessions expire in 1 hour
 app.config['SESSION_COOKIE_SAMESITE'] = 'Lax'
-app.config['SESSION_COOKIE_SECURE'] = True
+app.config['SESSION_COOKIE_SECURE'] = False
 
 try:
     redis_conn = Redis.from_url(redis_url)
