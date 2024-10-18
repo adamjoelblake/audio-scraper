@@ -117,8 +117,10 @@ def scrapeAudio():
         # return audio files to front end
         audioFiles = main.chooseBook(bookOptions, selected_book_index)
         session['audioFiles'] = audioFiles
-        # for idx, file in audioFiles.items():
-        #     print(f"Audio File {idx}: {file}")
+        
+        # Print session data for debugging
+        print(f"Session Audio Files: {session['audioFiles']}")
+        print(f"Session Book Dict: {session['bookDict']}")
 
         return jsonify({
             'audioFiles':audioFiles,
