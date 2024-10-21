@@ -6,17 +6,17 @@
     <title>Audiobook Scraper</title>
 
     <!-- CSS -->
-    <link rel="stylesheet" href="style.css">
+    <link rel="stylesheet" href="{{ url_for('static', filename='style.css') }}">
     <!-- Bootstrap CSS -->
     <link href="https://stackpath.bootstrapcdn.com/bootstrap/4.5.2/css/bootstrap.min.css" rel="stylesheet">
 
     <!-- Bootstrap JS (Optional if you need Bootstrap components like modals or dropdowns) -->
     <script src="https://stackpath.bootstrapcdn.com/bootstrap/4.5.2/js/bootstrap.bundle.min.js"></script>
-    <script src="script.js"></script>
+    <script src="{{ url_for('static', filename='script.js') }}"></script>
 </head>
 <body class="container mt-5">
     <h1 class="text-center mb-4" id="titleHeader">
-        <img src="EZ_Audiobooks_Logo.png" alt="EZ Audiobooks" class="title-image">
+        <img src="{{ url_for('static', filename='EZ_Audiobooks_Logo.png') }}" alt="EZ Audiobooks" class="title-image">
     </h1>
 
     <!-- Form to submit book title and author -->
