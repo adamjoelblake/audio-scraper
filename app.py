@@ -7,10 +7,25 @@ import os
 import main
 import requests
 import tempfile
+import logging
+import google.cloud.logging
+from google.cloud.logging.handlers import CloudLoggingHandler
 
 
 # Initialize the Flask application
 app = Flask(__name__)
+
+# Google Cloud Logging setup
+client = google.cloud.logging.Client()
+handler = CloudLoggingHandler(client)
+
+# Set up logging
+cloud_logger = logging.getLogger("cloudLogger")
+cloud_logger.setLevel(logging.INFO) #Hello
+cloud_logger.addHandler(handler)
+
+# Example of using cloud logger
+cloud_logger.info("Google Cloud Logging is configured and running!")
 
 # Secret key for signing the session data
 app.secret_key = 'I_LOVE_READING_BOOKS'
