@@ -18,7 +18,7 @@ function searchBooks(event)
     document.getElementById('optionsList').innerHTML = '<li>Loading book options...</li>';
 
     // Send book title and author to the flask app
-    fetch('https://audiobook-scraper-44c702a3d5e0.herokuapp.com/scrape', 
+    fetch('https://ezaudiobooks.ddns.net/scrape', 
     {
         method: 'POST',
         credentials: 'include',
@@ -90,7 +90,7 @@ function selectBook(selection)
         bookDict: bookDict 
     });
 
-    fetch('https://audiobook-scraper-44c702a3d5e0.herokuapp.com/scrape/continue', 
+    fetch('https://ezaudiobooks.ddns.net/scrape/continue', 
     {
         method: 'POST',
         credentials: 'include',
@@ -167,7 +167,7 @@ function downloadAudioFiles()
 {
     // Trigger single request to download the ZIP
     const link = document.createElement('a');
-    link.href = 'https://audiobook-scraper-44c702a3d5e0.herokuapp.com/download_all';
+    link.href = 'https://ezaudiobooks.ddns.net/download_all';
     link.download = `${bookTitle}_audiobook.zip`;
     document.body.appendChild(link);
     link.click();
