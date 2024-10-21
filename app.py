@@ -6,6 +6,8 @@ from io import BytesIO
 import os
 import main
 import requests
+import tempfile
+
 
 # Initialize the Flask application
 app = Flask(__name__)
@@ -154,3 +156,6 @@ def download_audio():
 
     except Exception as e:
         return jsonify({'error': str(e)}), 500
+
+if __name__ == '__main__':
+    app.run(debug=True)
