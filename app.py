@@ -13,15 +13,19 @@ app = Flask(__name__)
 # Secret key for signing the session data
 app.secret_key = 'I_LOVE_READING_BOOKS'
 
-# Session configuration for Heroku's server-side storage
-app.config['SESSION_TYPE'] = 'filesystem'  # Use Heroku's ephemeral file system
+# Session configuration for Google Cloud's server-side storage
+app.config['SESSION_TYPE'] = 'filesystem'  # Use filesystem for sessions
+app.config['SESSION_FILE_DIR'] = '/home/adamjoelblake/audioScraper/sessions'  # Store sessions persistently on your VM
 app.config['SESSION_PERMANENT'] = True
 app.config['SESSION_USE_SIGNER'] = True
-app.config['SESSION_FILE_DIR'] = '/tmp/flask_session'  # Store session data in the /tmp directory on Heroku
-app.config['SESSION_FILE_THRESHOLD'] = 500  # Limit for number of sessions to store
+app.config['SESSION_FILE_THRESHOLD'] = 500  # Limit for the number of sessions to store
 app.config['PERMANENT_SESSION_LIFETIME'] = 3600  # Sessions expire in 1 hour
 app.config['SESSION_COOKIE_SAMESITE'] = 'Lax'
-app.config['SESSION_COOKIE_SECURE'] = False
+app.config['SESSION_COOKIE_SECURE'] = True  # Ensure secure cookies over HTTPS
+
+# Ensure the session directory exists
+if not os.path.exists(app.config['SESSION_FILE_DIR']):
+    os.makedirs(app.config['SESSION_FILE_DIR'])
 
 # Initialize session
 Session(app)
@@ -90,10 +94,10 @@ def scrapeAudio():
         print(f"Selected book index: {selected_book_index}")
         
         # retrieved cached book options
-        bookOptions = data.get('bookOptions')
-        print(f"Local book options: {bookOptions}")
-        bookDict = data.get('bookDict')
-        print(f"Local bookDict: {bookDict}")
+        bookOptions = session.get('bookOptions')
+        print(f"book options: {bookOptions}")
+        bookDict = session.get('bookDict')
+        print(f"bookDict: {bookDict}")
 
         if not bookOptions or not bookDict:
             print("Local storage error")
@@ -102,7 +106,6 @@ def scrapeAudio():
         # return audio files to front end
         audioFiles = main.chooseBook(bookOptions, selected_book_index)
         session['audioFiles'] = audioFiles
-        session['bookDict'] = bookDict
         
         # Print session data for debugging
         print(f"Session Audio Files: {session['audioFiles']}")
@@ -151,6 +154,3 @@ def download_audio():
 
     except Exception as e:
         return jsonify({'error': str(e)}), 500
-
-if __name__ == '__main__':
-    app.run(debug=True)
