@@ -1,4 +1,4 @@
-from flask import Flask, request, jsonify, session, send_file
+from flask import Flask, request, jsonify, session, send_file, render_template
 from flask_session import Session
 from flask_cors import CORS
 import zipfile
@@ -38,7 +38,7 @@ CORS(app, resources={r"/*": {"origins": "*"}},
 
 @app.route('/')
 def home():
-    return jsonify({"message": "Welcome to the Audiobook Scraper API"})
+    return render_template('index.html')
 
 # First route: Accepts book title and may request additional input (First half of main function)
 @app.route('/scrape', methods=['POST'])
