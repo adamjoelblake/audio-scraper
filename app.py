@@ -10,6 +10,7 @@ import tempfile
 import logging
 import google.cloud.logging
 from google.cloud.logging.handlers import CloudLoggingHandler
+from google.cloud import storage
 
 
 # Initialize the Flask application
