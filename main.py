@@ -77,11 +77,15 @@ def cookSoup(url):
         cloud_logger.info("trying")
         response = requests.get(url)
         cloud_logger.info(f"Response status code: {response.status_code}")
-        
+        cloud_logger.info(f"Response content (first 100 chars): {response.text[:100]}")
         if response.status_code == 200:
-            soup = BeautifulSoup(response.text, 'html.parser')
-            cloud_logger.info(f"Soup created successfully with {len(soup)} elements.")
-            return soup
+            try:
+                soup = BeautifulSoup(response.text, 'html.parser')
+                cloud_logger.info(f"Soup created successfully with {len(soup)} elements.")
+                return soup
+            except:
+                cloud_logger.info(f"Failed to retrieve the page, status code: {response.status_code}")
+                return None
         else:
             cloud_logger.info(f"Failed to retrieve the page, status code: {response.status_code}")
             return None
