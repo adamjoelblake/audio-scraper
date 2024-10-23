@@ -1,0 +1,2 @@
+sudo systemctl reload flask-app
+sudo systemctl restart flask-app
