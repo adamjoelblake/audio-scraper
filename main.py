@@ -75,6 +75,7 @@ def cookSoup(url):
     cloud_logger.info(f"Cooking soup with url: {url}")
     try:
         response = requests.get(url)
+        cloud_logger.info(response)
         soup = BeautifulSoup(response.text, 'html.parser')
         cloud_logger.info(soup)
         return soup
