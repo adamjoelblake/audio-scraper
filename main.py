@@ -61,20 +61,22 @@ def getQueryUrl(queryDict):
             queryAuthor = queryDict.get('author').strip().replace(' ','+')
             query = queryTitle + '+' + queryAuthor      
         query = queryTitle
-        cloud_logger.info(f"Query: {query}")
+        # cloud_logger.info(f"Query: {query}")
         site = getKnownSites().get("dailyAudioBooks")
-        cloud_logger.info(f"Site: {site}")
+        # cloud_logger.info(f"Site: {site}")
         searchUrl = site.get('search_url')
         queryUrl = searchUrl + query
-        cloud_logger.info(f"Query Url: {queryUrl}")
+        # cloud_logger.info(f"Query Url: {queryUrl}")
         return queryUrl
     except Exception as e:
-        print(f"Error in main function getQueryUrl: {e}")
+        cloud_logger.info(f"Error in main function getQueryUrl: {e}")
 
 def cookSoup(url):
+    cloud_logger.info(f"Cooking soup with url: {url}")
     try:
         response = requests.get(url)
         soup = BeautifulSoup(response.text, 'html.parser')
+        cloud_logger.info(soup)
         return soup
     except Exception as e:
         cloud_logger.info(f"Error in main function cookSoup: {e}")
