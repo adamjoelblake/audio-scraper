@@ -41,6 +41,10 @@ app.config['PERMANENT_SESSION_LIFETIME'] = 3600  # Sessions expire in 1 hour
 app.config['SESSION_COOKIE_SAMESITE'] = 'Lax'
 app.config['SESSION_COOKIE_SECURE'] = True  # Ensure secure cookies over HTTPS
 
+# Initialize Google Cloud Storage
+storage_client = storage.Client()
+bucket_name = 'audiobook-bucket-22/'
+
 # Ensure the session directory exists
 if not os.path.exists(app.config['SESSION_FILE_DIR']):
     os.makedirs(app.config['SESSION_FILE_DIR'])

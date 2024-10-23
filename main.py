@@ -2,7 +2,18 @@ from bs4 import BeautifulSoup
 import requests
 import json
 import os
+import logging
+import google.cloud.logging
+from google.cloud.logging.handlers import CloudLoggingHandler
 
+# Google Cloud Logging setup
+client = google.cloud.logging.Client()
+handler = CloudLoggingHandler(client)
+
+# Set up logging
+cloud_logger = logging.getLogger("cloudLogger")
+cloud_logger.setLevel(logging.INFO) #Hello
+cloud_logger.addHandler(handler)
 
 # Pseudo Code
 
@@ -50,12 +61,12 @@ def getQueryUrl(queryDict):
             queryAuthor = queryDict.get('author').strip().replace(' ','+')
             query = queryTitle + '+' + queryAuthor      
         query = queryTitle
-        print(f"Query: {query}")
+        cloud_logger.info(f"Query: {query}")
         site = getKnownSites().get("dailyAudioBooks")
-        print(f"Site: {site}")
+        cloud_logger.info(f"Site: {site}")
         searchUrl = site.get('search_url')
         queryUrl = searchUrl + query
-        print(f"Query Url: {queryUrl}")
+        cloud_logger.info(f"Query Url: {queryUrl}")
         return queryUrl
     except Exception as e:
         print(f"Error in main function getQueryUrl: {e}")
@@ -66,7 +77,7 @@ def cookSoup(url):
         soup = BeautifulSoup(response.text, 'html.parser')
         return soup
     except Exception as e:
-        print(f"Error in main function cookSoup: {e}")
+        cloud_logger.info(f"Error in main function cookSoup: {e}")
 
 def getBookOptions(soup,bookDict):
     try:
