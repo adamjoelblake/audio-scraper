@@ -66,35 +66,35 @@ def scrapeBookOptions():
     try:
         # Get user input
         data = request.json
-        print(f"Received data: {data}")
+        cloud_logger.info(f"Received data: {data}")
         book_title = data.get('title')
         book_author = data.get('author')
-        print(f"Book title: {book_title}")
+        cloud_logger.info(f"Book title: {book_title}")
         bookDict = {'title': book_title, 'author': book_author}
 
         # First half of main function
-        print(f"Calling getQueryUrl with {bookDict}")
+        cloud_logger.info(f"Calling getQueryUrl with {bookDict}")
         queryUrl = main.getQueryUrl(bookDict)
-        print(f"Query URL: {queryUrl}")
+        cloud_logger.info(f"Query URL: {queryUrl}")
 
-        print("Calling cookSoup")
+        cloud_logger.info("Calling cookSoup")
         soup = main.cookSoup(queryUrl)
-        print("Soup created")
+        cloud_logger.info("Soup created")
 
-        print("Getting book options")
+        cloud_logger.info("Getting book options")
         bookOptions = main.getBookOptions(soup, bookDict)
-        print(f"bookOptions function call successful")
+        cloud_logger.info(f"bookOptions function call successful")
         for option in bookOptions:
-            print(bookOptions[option])
+            cloud_logger.info(bookOptions[option])
 
         if not bookOptions:
             return jsonify({'error': 'No matching books found!'}), 404
 
         # Cache the book options
         session['options'] = bookOptions
-        print(f"Session options: {session['options'].keys()}")
+        cloud_logger.info(f"Session options: {session['options'].keys()}")
         session['bookDict'] = bookDict
-        print(f"Session bookDict: {session['bookDict']}")
+        cloud_logger.info(f"Session bookDict: {session['bookDict']}")
 
         # Return book options to front end for user to choose
         return jsonify({'bookOptions': bookOptions})
@@ -108,16 +108,16 @@ def scrapeAudio():
     try:
         data = request.json
         selected_book_index = data.get('selection')
-        print(f"Selected book index: {selected_book_index}")
+        cloud_logger.info(f"Selected book index: {selected_book_index}")
         
         # retrieved cached book options
         bookOptions = session.get('bookOptions')
-        print(f"book options: {bookOptions}")
+        cloud_logger.info(f"book options: {bookOptions}")
         bookDict = session.get('bookDict')
-        print(f"bookDict: {bookDict}")
+        cloud_logger.info(f"bookDict: {bookDict}")
 
         if not bookOptions or not bookDict:
-            print("Local storage error")
+            cloud_logger.info("Local storage error")
             return jsonify({'error': 'Session expired or no book options available.'}), 400
 
         # return audio files to front end
@@ -125,8 +125,8 @@ def scrapeAudio():
         session['audioFiles'] = audioFiles
         
         # Print session data for debugging
-        print(f"Session Audio Files: {session['audioFiles']}")
-        print(f"Session Book Dict: {session['bookDict']}")
+        cloud_logger.info(f"Session Audio Files: {session['audioFiles']}")
+        cloud_logger.info(f"Session Book Dict: {session['bookDict']}")
 
         return jsonify({
             'audioFiles': audioFiles,
@@ -134,7 +134,7 @@ def scrapeAudio():
         }), 200
 
     except Exception as e:
-        print(f"Error: {str(e)}")
+        cloud_logger.info(f"Error: {str(e)}")
         return jsonify({'error': str(e)}), 500
 
 # Third route: Download the file from the external source and send it to the client
@@ -144,8 +144,8 @@ def download_audio():
         bookDict = session.get('bookDict')
         audioFiles = session.get('audioFiles')
 
-        print(f"Session Book Dict: {bookDict}")
-        print(f"Session Audio Files: {audioFiles}")
+        cloud_logger.info(f"Session Book Dict: {bookDict}")
+        cloud_logger.info(f"Session Audio Files: {audioFiles}")
         
         if not bookDict or not audioFiles:
             return jsonify({'error': 'Audio files or bookDict missing from session'}), 400
