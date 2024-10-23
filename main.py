@@ -74,6 +74,7 @@ def getQueryUrl(queryDict):
 def cookSoup(url):
     cloud_logger.info(f"Cooking soup with url: {url}")
     try:
+        cloud_logger.info("trying")
         response = requests.get(url)
         cloud_logger.info(response)
         soup = BeautifulSoup(response.text, 'html.parser')
