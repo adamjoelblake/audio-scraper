@@ -91,7 +91,7 @@ def scrapeBookOptions():
             return jsonify({'error': 'No matching books found!'}), 404
 
         # Cache the book options
-        session['options'] = bookOptions
+        session['bookOptions'] = bookOptions
         cloud_logger.info(f"Session options: {session['options']}")
         session['bookDict'] = bookDict
         cloud_logger.info(f"Session bookDict: {session['bookDict']}")
