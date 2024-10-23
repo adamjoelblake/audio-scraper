@@ -92,7 +92,7 @@ def scrapeBookOptions():
 
         # Cache the book options
         session['options'] = bookOptions
-        cloud_logger.info(f"Session options: {session['options'].keys()}")
+        cloud_logger.info(f"Session options: {session['options']}")
         session['bookDict'] = bookDict
         cloud_logger.info(f"Session bookDict: {session['bookDict']}")
 
