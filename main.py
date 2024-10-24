@@ -78,6 +78,7 @@ def cookSoup(url):
         response = requests.get(url, timeout=10)
         cloud_logger.info(f"Response status code: {response.status_code}")
         cloud_logger.info(f"Response content (first 100 chars): {response.text[:100]}")
+        cloud_logger.info(f"Full response: {response.text}")
         if response.status_code == 200:
             try:
                 cloud_logger.info("Attempting to parse with BeautifulSoup...")
