@@ -84,7 +84,7 @@ def cookSoup(url):
             try:
                 cloud_logger.info("Attempting to parse with BeautifulSoup...")
                 soup = BeautifulSoup(response.text, 'html.parser')
-                cloud_logger.info(f"Soup created successfully with {len(soup)} elements.")
+                cloud_logger.info(f"Parsed content preview: {soup.prettify()[:500]}")
                 return soup
             except:
                 cloud_logger.info(f"Failed to retrieve the page, status code: {response.status_code}")
