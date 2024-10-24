@@ -84,8 +84,17 @@ def cookSoup(url):
             try:
                 cloud_logger.info("Attempting to parse with BeautifulSoup...")
                 soup = BeautifulSoup(response.text, 'html.parser')
-                cloud_logger.info(f"Parsed content preview: {soup.prettify()[:500]}")
-                return soup
+                if not soup or len(soup) == 0:
+                    cloud_logger.error("Soup object is empty or None. The page might be malformed.")
+                else:
+                    # Optionally, check for specific tags
+                    title_tag = soup.find('title')
+                    if title_tag:
+                        cloud_logger.info(f"Page title: {title_tag.string}")
+                    else:
+                        cloud_logger.error("No title tag found in the parsed HTML.")
+                        cloud_logger.info(f"Parsed content preview: {soup.prettify()[:500]}")
+                        return soup
             except:
                 cloud_logger.info(f"Failed to retrieve the page, status code: {response.status_code}")
                 return None
