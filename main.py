@@ -72,7 +72,7 @@ def getQueryUrl(queryDict):
         cloud_logger.info(f"Error in main function getQueryUrl: {e}")
 
 def cookSoup(url):
-    url = "google.com"
+    url = "https://google.com"
     cloud_logger.info(f"Cooking soup with url: {url}")
     try:
         cloud_logger.info("trying")
