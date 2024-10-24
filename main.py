@@ -80,6 +80,7 @@ def cookSoup(url):
         cloud_logger.info(f"Response content (first 100 chars): {response.text[:100]}")
         if response.status_code == 200:
             try:
+                cloud_logger.info("Attempting to parse with BeautifulSoup...")
                 soup = BeautifulSoup(response.text, 'html.parser')
                 cloud_logger.info(f"Soup created successfully with {len(soup)} elements.")
                 return soup
