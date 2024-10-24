@@ -76,6 +76,7 @@ def cookSoup(url):
     try:
         cloud_logger.info("trying")
         response = requests.get(url, timeout=10)
+        cloud_logger.info(f"Redirect history: {response.history}")
         cloud_logger.info(f"Response status code: {response.status_code}")
         cloud_logger.info(f"Response content (first 100 chars): {response.text[:100]}")
         cloud_logger.info(f"Full response length: {len(response.text)}")
