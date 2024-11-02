@@ -127,7 +127,7 @@ def scrapeBookOptions():
                 cloud_logger.info(f"Unable to store site locally.")
             
             
-            cloud_logger.info(jsonify({'bookOptions': bookOptions}))
+            cloud_logger.info("yes")
             # Return book options to front end for user to choose
             return jsonify({'bookOptions': bookOptions})
 
