@@ -288,6 +288,7 @@ def cookSoup(url):
                     title_tag = soup.find('title')
                     if title_tag:
                         cloud_logger.info(f"Page title: {title_tag.string}")
+                        return soup
                     else:
                         cloud_logger.error("No title tag found in the parsed HTML.")
                         cloud_logger.info(f"Parsed content preview: {soup.prettify()[:500]}")
