@@ -107,7 +107,7 @@ def scrapeBookOptions():
             # Cache the book options
             cloud_logger.info(f"Storing data locally")
             try:
-                cloud_logger.info(f"BOOK OPTIONS")
+                session['bookOptions'] = bookOptions
             except Exception as e:
                 cloud_logger.info(f"Unable to store bookOptions locally.")
             try:
@@ -196,7 +196,6 @@ def download_audio():
                 yield chunk
     
     return Response(generate(), mimetype='application/zip')
-
 
 def getQueryUrl(site, queryDict):
     try:
