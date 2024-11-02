@@ -111,11 +111,19 @@ def scrapeBookOptions():
                 try:
                     session['bookOptions'] = bookOptions
                     cloud_logger.info(f"Session options: {session['options']}")
+                except Exception as e:
+                    cloud_logger.info(f"Unable to store bookOptions locally. Error: {e}")
+                try:
                     session['bookDict'] = bookDict
                     cloud_logger.info(f"Session bookDict: {session['bookDict']}")
-                    session['site'] = site
                 except Exception as e:
-                    cloud_logger.info(f"Error: {e}")
+                    cloud_logger.info(f"Unable to store bookDict locally. Error: {e}")
+                try:
+                    session['site'] = site
+                    cloud_logger.info(f"Session site: {site}")
+                except Exception as e:
+                    cloud_logger.info(f"Unable to store site locally. Error: {e}")
+                
                 
                 cloud_logger.info(jsonify({'bookOptions': bookOptions}))
                 # Return book options to front end for user to choose
