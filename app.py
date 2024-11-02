@@ -107,6 +107,7 @@ def scrapeBookOptions():
 
             if bookOptions:
                 # Cache the book options
+                cloud_logger.info(f"Storing book options locally")
                 session['bookOptions'] = bookOptions
                 cloud_logger.info(f"Session options: {session['options']}")
                 session['bookDict'] = bookDict
@@ -228,9 +229,7 @@ def getBookOptions(soup, bookDict, site):
             title = entry.find(entry_title_tag).text
             cleanTitle = title.strip().lower()
             if userTitle in cleanTitle:
-                cloud_logger.info(f"scraping audio")
                 audioUrlDict= scrapeAudio(entry, audio_tag)
-                cloud_logger.info("audio scraped")
                 bookOptions[title] = audioUrlDict
         return bookOptions
     
