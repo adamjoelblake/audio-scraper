@@ -108,11 +108,14 @@ def scrapeBookOptions():
             if bookOptions:
                 # Cache the book options
                 cloud_logger.info(f"Storing book options locally")
-                session['bookOptions'] = bookOptions
-                cloud_logger.info(f"Session options: {session['options']}")
-                session['bookDict'] = bookDict
-                cloud_logger.info(f"Session bookDict: {session['bookDict']}")
-                session['site'] = site
+                try:
+                    session['bookOptions'] = bookOptions
+                    cloud_logger.info(f"Session options: {session['options']}")
+                    session['bookDict'] = bookDict
+                    cloud_logger.info(f"Session bookDict: {session['bookDict']}")
+                    session['site'] = site
+                except Exception as e:
+                    cloud_logger.info(f"Error: {e}")
                 
                 cloud_logger.info(jsonify({'bookOptions': bookOptions}))
                 # Return book options to front end for user to choose
