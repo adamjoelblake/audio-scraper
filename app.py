@@ -182,6 +182,7 @@ def download_audio():
         with zipfile.ZipFile(zip_buffer, 'w', zipfile.ZIP_DEFLATED) as zip_file:
             for index, file_url in audioFiles.items():
                 # download each audio file
+                cloud_logger.info(f"Attempting to download file at URL: {file_url}")
                 response = requests.get(file_url)
                 if response.status_code != 200:
                     return jsonify({'error': f'Failed to download audio file {index}'}), 500
