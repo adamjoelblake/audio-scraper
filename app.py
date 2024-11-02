@@ -112,7 +112,8 @@ def scrapeBookOptions():
                 session['bookDict'] = bookDict
                 cloud_logger.info(f"Session bookDict: {session['bookDict']}")
                 session['site'] = site
-
+                
+                cloud_logger.info(jsonify({'bookOptions': bookOptions}))
                 # Return book options to front end for user to choose
                 return jsonify({'bookOptions': bookOptions})
 
@@ -249,7 +250,6 @@ def scrapeAudio(entry, audio_tag):
     try:
         audioUrls= {}
         audio_section = entry.find_all(audio_tag)
-        cloud_logger.info(f"Audio Segments: {audio_section}")
 
         count = 1
         for audio in audio_section:
@@ -260,7 +260,6 @@ def scrapeAudio(entry, audio_tag):
                 url = source['src'] if source and source.has_attr('src') else None
             audioUrls[count] = url
             count += 1
-            cloud_logger.info(f"URL: {url}")
         return audioUrls
     
     except Exception as e:
