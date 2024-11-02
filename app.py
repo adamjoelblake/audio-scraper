@@ -228,7 +228,7 @@ def getBookOptions(soup, bookDict, site):
             cleanTitle = title.strip().lower()
             if userTitle in cleanTitle:
                 cloud_logger.info(f"scraping audio")
-                audioUrlDict= scrapeAudio(entry, audio_tag, audio_file_tag)
+                audioUrlDict= scrapeAudio(entry, audio_tag)
                 cloud_logger.info("audio scraped")
                 bookOptions[title] = audioUrlDict
         return bookOptions
