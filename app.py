@@ -102,7 +102,7 @@ def scrapeBookOptions():
             cloud_logger.info("Getting book options")
             bookOptions = getBookOptions(soup, bookDict, site)
             for book in bookOptions:
-                cloud_logger.info(f"{book}")
+                cloud_logger.info(f"Entry Title: {book}")
             
 
             if bookOptions:

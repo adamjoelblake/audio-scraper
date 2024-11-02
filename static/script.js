@@ -32,6 +32,7 @@ function searchBooks(event)
     // Handling response from the flask app
     .then(response => response.json())
     .then(data => {
+        console.log("data")
         if (data.bookOptions) 
         {
             const bookOptions = data.bookOptions;
