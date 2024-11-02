@@ -66,7 +66,7 @@ def getKnownSites():
             data = json.load(file)
         return data
     except Exception as e:
-        print(f"Error in main function getKnownSites: {e}")
+        cloud_logger.info(f"Error in main function getKnownSites: {e}")
 knownSitesJson = getKnownSites()
 siteNames = knownSitesJson.keys()
 
@@ -146,7 +146,7 @@ def scrapeAudio():
         audioFiles = chooseBook(bookOptions, selected_book_index)
         session['audioFiles'] = audioFiles
         
-        # Print session data for debugging
+        # cloud_logger.info session data for debugging
         cloud_logger.info(f"Session Audio Files: {session['audioFiles']}")
         cloud_logger.info(f"Session Book Dict: {session['bookDict']}")
 
@@ -234,16 +234,16 @@ def getBookOptions(soup, bookDict, site):
         return bookOptions
     
     except Exception as e:
-        print(f"Error in main function getBookOptions: {e}")
+        cloud_logger.info(f"Error in main function getBookOptions: {e}")
 
 def chooseBook(options, selection_index):
     try:
         titleOptions = list(options.keys())
         selected_title = titleOptions[selection_index - 1]
-        print(f"Selected Option: {selected_title}")
+        cloud_logger.info(f"Selected Option: {selected_title}")
         return options[selected_title]
     except Exception as e:
-        print(f"Error in main function chooseBook: {e}")
+        cloud_logger.info(f"Error in main function chooseBook: {e}")
 
 def scrapeAudio(entry, audio_tag):
     try:
@@ -263,7 +263,7 @@ def scrapeAudio(entry, audio_tag):
         return audioUrls
     
     except Exception as e:
-        print(f"Error in main function scrapeAudio: {e}")
+        cloud_logger.info(f"Error in main function scrapeAudio: {e}")
 
 def cookSoup(url):
     cloud_logger.info(f"Cooking soup with url: {url}")
