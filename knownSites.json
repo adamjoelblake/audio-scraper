@@ -8,7 +8,7 @@
     
     "dailyAudioBooks":{
         "base_url":"https://dailyaudiobooks.co/",
-        "search_url":"http://dailyaudiobooks.co/?s=",
+        "search_url":"https://dailyaudiobooks.co/?s=",
         "audio_selector":"",
         "file_link_attr":""
     }
