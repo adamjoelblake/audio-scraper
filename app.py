@@ -255,11 +255,12 @@ def scrapeAudio(entry, audio_tag):
         for audio in audio_section:
             url = audio.get('src')
             if not url:
-                cloud_logger.info(f"URL: {url}")
+                
                 source = audio.find('source')
                 url = source['src'] if source and source.has_attr('src') else None
             audioUrls[count] = url
             count += 1
+            cloud_logger.info(f"URL: {url}")
         return audioUrls
     
     except Exception as e:
