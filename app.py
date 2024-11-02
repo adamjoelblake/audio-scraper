@@ -101,7 +101,9 @@ def scrapeBookOptions():
 
             cloud_logger.info("Getting book options")
             bookOptions = getBookOptions(soup, bookDict, site)
-            cloud_logger.info(f"bookOptions function call successful")
+            for book in bookOptions:
+                cloud_logger.info(f"{book}")
+            
 
             if bookOptions:
                 # Cache the book options
