@@ -1,4 +1,4 @@
-from flask import Flask, request, jsonify, session, send_file, render_template
+from flask import Flask, request, jsonify, session, send_file, render_template, Response
 from flask_session import Session
 from flask_cors import CORS
 import zipfile
@@ -166,38 +166,37 @@ def scrapeAudio():
 @app.route('/download_all', methods=['GET'])
 def download_audio():
     cloud_logger.info(f"Downloading audio")
-    try:
-        bookDict = session.get('bookDict')
-        audioFiles = session.get('audioFiles')
 
-        cloud_logger.info(f"Session Book Dict: {bookDict}")
-        cloud_logger.info(f"Session Audio Files: {audioFiles}")
-        
-        if not bookDict or not audioFiles:
-            return jsonify({'error': 'Audio files or bookDict missing from session'}), 400
+    bookDict = session.get('bookDict')
+    audioFiles = session.get('audioFiles')
 
-        # Create a zip file in memory
-        zip_buffer = BytesIO()
+    cloud_logger.info(f"Session Book Dict: {bookDict}")
+    cloud_logger.info(f"Session Audio Files: {audioFiles}")
+    
+    if not bookDict or not audioFiles:
+        return jsonify({'error': 'Audio files or bookDict missing from session'}), 400
 
-        with zipfile.ZipFile(zip_buffer, 'w', zipfile.ZIP_DEFLATED) as zip_file:
-            for index, file_url in audioFiles.items():
-                # download each audio file
-                cloud_logger.info(f"Attempting to download file at URL: {file_url}")
-                response = requests.get(file_url)
-                if response.status_code != 200:
-                    return jsonify({'error': f'Failed to download audio file {index}'}), 500
+    def generate():
+        with BytesIO() as zip_buffer:
+            with zipfile.ZipFile(zip_buffer, 'w', zipfile.ZIP_DEFLATED) as zip_file:
+                for index, file_url in audioFiles.items():
+                    # download each audio file
+                    cloud_logger.info(f"Attempting to download file at URL: {file_url}")
+                    response = requests.get(file_url, stream=True)
+                    if response.status_code == 200:
+                        zip_file.writestr(f"{bookDict['title']}_{index}.mp3", response.content)
+                    else:
+                        continue
+            
+            zip_buffer.seek(0)
+            while True:
+                chunk = zip_buffer.read(4096)
+                if not chunk:
+                    break
+                yield chunk
+    
+    return Response(generate(), mimetype='application/zip')
 
-                # Add downloaded content to ZIP
-                zip_file.writestr(f"{bookDict['title']}_{index}.mp3", response.content)
-
-        # Ensure the ZIP buffer is set at the beginning of the stream
-        zip_buffer.seek(0)
-
-        # Send the ZIP file as a downloadable attachment
-        return send_file(zip_buffer, download_name=f"{bookDict['title']}_audiobook.zip", as_attachment=True)
-
-    except Exception as e:
-        return jsonify({'error': str(e)}), 500
 
 def getQueryUrl(site, queryDict):
     try:
