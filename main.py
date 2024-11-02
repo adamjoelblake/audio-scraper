@@ -15,62 +15,6 @@ cloud_logger = logging.getLogger("cloudLogger")
 cloud_logger.setLevel(logging.INFO) #Hello
 cloud_logger.addHandler(handler)
 
-# Pseudo Code
-
-    # User input
-
-    # Search known sites until desired book is found
-
-    # Isolate desired audio files from search result
-        # Iterate through search result headers and grab first option that contains both title and author
-
-    # Save scraped audio to file
-
-
-# def main():
-#     bookDict = userBookChoice()
-#     queryUrl = getQueryUrl(bookDict)
-#     soup = cookSoup(queryUrl)
-#     articles = getBookOptions(soup,bookDict)
-#     selected_index = selectIndex(articles)
-#     article = chooseBook(articles, selected_index)
-#     audioFiles = scrapeAudio(article)
-#     for idx, file in audioFiles.items():
-#         print(f"{idx}. {file}")
-    # saveFolderPath= selectSaveFolder(bookDict)
-    # audioRequest(audioFiles,bookDict,saveFolderPath)
-    
-def getKnownSites():
-    try:
-        with open('knownSites.json', 'r') as file:
-            data = json.load(file)
-        return data
-    except Exception as e:
-        print(f"Error in main function getKnownSites: {e}")
-
-# def userBookChoice():
-#     title = input('Book Title: ')
-#     author = input('Author: ')
-#     queryDict = {'title':title, 'author':author}
-#     return queryDict
-
-def getQueryUrl(queryDict):
-    try:
-        queryTitle = queryDict.get('title').strip().replace(' ','+')
-        if queryDict.get('author'):
-            queryAuthor = queryDict.get('author').strip().replace(' ','+')
-            query = queryTitle + '+' + queryAuthor      
-        query = queryTitle
-        # cloud_logger.info(f"Query: {query}")
-        site = getKnownSites().get("dailyAudioBooks")
-        # cloud_logger.info(f"Site: {site}")
-        searchUrl = site.get('search_url')
-        queryUrl = searchUrl + query
-        # cloud_logger.info(f"Query Url: {queryUrl}")
-        return queryUrl
-    except Exception as e:
-        cloud_logger.info(f"Error in main function getQueryUrl: {e}")
-
 def cookSoup(url):
     cloud_logger.info(f"Cooking soup with url: {url}")
     try:
@@ -122,23 +66,6 @@ def getBookOptions(soup,bookDict):
     except Exception as e:
         print(f"Error in main function getBookOptions: {e}")
 
-# def selectIndex(options):
-#     titleOptions = list(options.keys())
-#     for idx, title in enumerate(titleOptions, start=1):
-#         print(f"{idx}. {title}")
-#     while True:
-#         try:
-#             choice = int(input("Enter the number of the book you want to select: "))
-#             if 1 <= choice <= len(titleOptions):
-#                 selected_title = titleOptions[choice-1]
-#                 print(f"You selected: {selected_title}")
-#                 break
-#             else:
-#                 print(f"Please enter a number between 1 and {len(titleOptions)}.")
-#         except ValueError:
-#             print("Invalid input. Please enter a number.")
-#     return choice
-
 def chooseBook(options, selection_index):
     try:
         titleOptions = list(options.keys())
@@ -148,10 +75,10 @@ def chooseBook(options, selection_index):
     except Exception as e:
         print(f"Error in main function chooseBook: {e}")
 
-def scrapeAudio(article):
+def scrapeAudio(entry):
     try:
         audioUrls= {}
-        audioTags = article.find_all('audio')
+        audioTags = entry.find_all('audio')
 
         count = 1
         for tag in audioTags:
@@ -195,4 +122,7 @@ def selectSaveFolder(bookDict):
     except Exception as e:
         print(f"Error in main function selectSaveFolder: {e}")
 
-# main()
+# Pseudo code for searching multiple sites
+    # Open 'Known Sites' in app.py and store information locally.
+    # Create a list with all query urls from 'Known Sites'
+    # Iterate through this list until a book is returned

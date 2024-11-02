@@ -3,8 +3,9 @@ from flask_session import Session
 from flask_cors import CORS
 import zipfile
 from io import BytesIO
+from bs4 import BeautifulSoup
 import os
-import main
+import json
 import requests
 import tempfile
 import logging
@@ -58,6 +59,17 @@ CORS(app, resources={r"/*": {"origins": "*"}},
      methods=["GET", "POST", "OPTIONS"],
      allow_headers=["Content-Type", "Authorization", "Access-Control-Allow-Credentials"])
 
+# Known site information
+def getKnownSites():
+    try:
+        with open('knownSites.json', 'r') as file:
+            data = json.load(file)
+        return data
+    except Exception as e:
+        print(f"Error in main function getKnownSites: {e}")
+knownSitesJson = getKnownSites()
+siteNames = knownSitesJson.keys()
+
 @app.route('/')
 def home():
     return render_template('index.html')
@@ -78,32 +90,33 @@ def scrapeBookOptions():
         bookDict = {'title': book_title, 'author': book_author}
 
         # First half of main function
-        cloud_logger.info(f"Calling getQueryUrl with {bookDict}")
-        queryUrl = main.getQueryUrl(bookDict)
-        cloud_logger.info(f"Query URL: {queryUrl}")
+        for site in siteNames:
+            cloud_logger.info(f"Calling getQueryUrl with {bookDict}")
+            queryUrl = getQueryUrl(site, bookDict)
+            cloud_logger.info(f"Query URL: {queryUrl}")
 
-        cloud_logger.info("Calling cookSoup")
-        soup = main.cookSoup(queryUrl)
-        cloud_logger.info("Soup created")
+            cloud_logger.info("Calling cookSoup")
+            soup = cookSoup(queryUrl)
+            cloud_logger.info("Soup created")
 
-        cloud_logger.info("Getting book options")
-        bookOptions = main.getBookOptions(soup, bookDict)
-        cloud_logger.info(f"bookOptions function call successful")
-        for option in bookOptions:
-            cloud_logger.info(bookOptions[option])
+            cloud_logger.info("Getting book options")
+            bookOptions = getBookOptions(soup, bookDict, site)
+            cloud_logger.info(f"bookOptions function call successful")
+
+            if bookOptions:
+                # Cache the book options
+                session['bookOptions'] = bookOptions
+                cloud_logger.info(f"Session options: {session['options']}")
+                session['bookDict'] = bookDict
+                cloud_logger.info(f"Session bookDict: {session['bookDict']}")
+                session['site'] = site
+
+                # Return book options to front end for user to choose
+                return jsonify({'bookOptions': bookOptions})
 
         if not bookOptions:
             return jsonify({'error': 'No matching books found!'}), 404
 
-        # Cache the book options
-        session['bookOptions'] = bookOptions
-        cloud_logger.info(f"Session options: {session['options']}")
-        session['bookDict'] = bookDict
-        cloud_logger.info(f"Session bookDict: {session['bookDict']}")
-
-        # Return book options to front end for user to choose
-        return jsonify({'bookOptions': bookOptions})
-        
     except Exception as e:
         return jsonify({'error': str(e)}), 500
 
@@ -120,13 +133,15 @@ def scrapeAudio():
         cloud_logger.info(f"book options: {bookOptions}")
         bookDict = session.get('bookDict')
         cloud_logger.info(f"bookDict: {bookDict}")
+        site = session.get('site')
+        cloud_logger.info(f"Site: {site}")
 
         if not bookOptions or not bookDict:
             cloud_logger.info("Local storage error")
             return jsonify({'error': 'Session expired or no book options available.'}), 400
 
         # return audio files to front end
-        audioFiles = main.chooseBook(bookOptions, selected_book_index)
+        audioFiles = chooseBook(bookOptions, selected_book_index)
         session['audioFiles'] = audioFiles
         
         # Print session data for debugging
@@ -176,6 +191,106 @@ def download_audio():
 
     except Exception as e:
         return jsonify({'error': str(e)}), 500
+
+def getQueryUrl(site, queryDict):
+    try:
+        queryTitle = queryDict.get('title').strip().replace(' ','+')
+        if queryDict.get('author'):
+            queryAuthor = queryDict.get('author').strip().replace(' ','+')
+            query = queryTitle + '+' + queryAuthor      
+        query = queryTitle
+        siteDict = knownSitesJson.get(site)
+        searchUrl = siteDict.get('search_url')
+        queryUrl = searchUrl + query
+        return queryUrl
+    except Exception as e:
+        cloud_logger.info(f"Error in main function getQueryUrl: {e}")
+
+def getBookOptions(soup, bookDict, site):
+    # Site navigation information
+    navigation = knownSitesJson.get(site).get("html_navigation")
+    section_tag = navigation.get("query_results_section")
+    section_id = navigation.get("query_results_id")
+    entry_tag = navigation.get("entry")
+    entry_title_tag = navigation.get("entry_title")
+    audio_tag = navigation.get("audio_tag")
+    audio_file_tag = navigation.get("file_tag")
+
+    try:
+        bookOptions = {}
+        userTitle = bookDict.get('title').lower()
+        entries = soup.find(section_tag, id=section_id).find_all(entry_tag)
+        for entry in entries:
+            title = entry.find(entry_title_tag).text
+            cleanTitle = title.strip().lower()
+            if userTitle in cleanTitle:
+                audioUrlDict= scrapeAudio(entry, audio_tag, audio_file_tag)
+                bookOptions[title] = audioUrlDict
+        return bookOptions
+    
+    except Exception as e:
+        print(f"Error in main function getBookOptions: {e}")
+
+def chooseBook(options, selection_index):
+    try:
+        titleOptions = list(options.keys())
+        selected_title = titleOptions[selection_index - 1]
+        print(f"Selected Option: {selected_title}")
+        return options[selected_title]
+    except Exception as e:
+        print(f"Error in main function chooseBook: {e}")
+
+def scrapeAudio(entry, audio_tag):
+    try:
+        audioUrls= {}
+        audio_section = entry.find_all(audio_tag)
+
+        count = 1
+        for audio in audio_section:
+            url = audio.get('src')
+            if not url:
+                source = audio.find('source')
+                url = source['src'] if source and source.has_attr('src') else None
+            audioUrls[count] = url
+            count += 1
+        return audioUrls
+    
+    except Exception as e:
+        print(f"Error in main function scrapeAudio: {e}")
+
+def cookSoup(url):
+    cloud_logger.info(f"Cooking soup with url: {url}")
+    try:
+        cloud_logger.info("trying")
+        response = requests.get(url, timeout=10)
+        cloud_logger.info(f"Redirect history: {response.history}")
+        cloud_logger.info(f"Response status code: {response.status_code}")
+        cloud_logger.info(f"Response content (first 100 chars): {response.text[:100]}")
+        cloud_logger.info(f"Full response length: {len(response.text)}")
+        cloud_logger.info(f"Full response: {response.text}")
+        if response.status_code == 200:
+            try:
+                cloud_logger.info("Attempting to parse with BeautifulSoup...")
+                soup = BeautifulSoup(response.text, 'html.parser')
+                if not soup or len(soup) == 0:
+                    cloud_logger.error("Soup object is empty or None. The page might be malformed.")
+                else:
+                    # Optionally, check for specific tags
+                    title_tag = soup.find('title')
+                    if title_tag:
+                        cloud_logger.info(f"Page title: {title_tag.string}")
+                    else:
+                        cloud_logger.error("No title tag found in the parsed HTML.")
+                        cloud_logger.info(f"Parsed content preview: {soup.prettify()[:500]}")
+                        return soup
+            except:
+                cloud_logger.info(f"Failed to retrieve the page, status code: {response.status_code}")
+                return None
+        else:
+            cloud_logger.info(f"Failed to retrieve the page, status code: {response.status_code}")
+            return None
+    except Exception as e:
+        cloud_logger.info(f"Error in main function cookSoup: {e}")
 
 if __name__ == '__main__':
     app.run(debug=True)

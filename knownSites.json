@@ -1,15 +1,37 @@
 {
-    "hdAudioBooks":{
+    "hdAudioBooks":
+    {
         "base_url":"https://hdaudiobooks.net/",
         "search_url":"https://hdaudiobooks.net//?s={query}",
         "audio_selector":"",
         "file_link_attr":""
     },
     
-    "dailyAudioBooks":{
-        "base_url":"https://dailyaudiobooks.co/",
-        "search_url":"https://dailyaudiobooks.co/?s=",
+    "dailyAudioBooks":
+    {
+        "base_url":"https://dailyaudiobooks.net/",
+        "search_url":"https://dailyaudiobooks.net/?s=",
         "audio_selector":"",
-        "file_link_attr":""
-    }
+        "html_navigation":
+            {
+                "query_results_section":"section",
+                "query_results_id":"content",
+                "entry":"article",
+                "entry_title":"h2",
+                "audio_tag":"audio",
+                "file_tag":"a"
+            }
+    },
+
+    
+        "sharedAudiobooks.net":
+        {
+            "base_url":"https://sharedaudiobooks.co/",
+            "search_url":"https://sharedaudiobooks.co/?s=",
+            "audio_selector":"",
+            "html_navigation":
+            {
+                "section_id":""
+            }
+        }
 }
