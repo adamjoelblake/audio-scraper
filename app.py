@@ -216,6 +216,7 @@ def getBookOptions(soup, bookDict, site):
     audio_tag = navigation.get("audio_tag")
     audio_file_tag = navigation.get("file_tag")
 
+    cloud_logger.info(f"Getting book options for {site}")
     try:
         bookOptions = {}
         userTitle = bookDict.get('title').lower()
