@@ -222,7 +222,7 @@ def getBookOptions(soup, bookDict, site):
     try:
         bookOptions = {}
         userTitle = bookDict.get('title').lower()
-        cloud_logger.info(f"Grabbing section")
+        cloud_logger.info(f"Grabbing section from {soup}")
         section = soup.find(section_tag)
         cloud_logger.info(f"Section: {section}")
         entries = soup.find(section_tag, id=section_id).find_all(entry_tag)
