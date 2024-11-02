@@ -222,11 +222,7 @@ def getBookOptions(soup, bookDict, site):
     try:
         bookOptions = {}
         userTitle = bookDict.get('title').lower()
-        cloud_logger.info(f"Grabbing section from {soup}")
-        section = soup.find(section_tag)
-        cloud_logger.info(f"Section: {section}")
         entries = soup.find(section_tag, id=section_id).find_all(entry_tag)
-        cloud_logger.info(f"Entries: {entries}")
         for entry in entries:
             title = entry.find(entry_title_tag).text
             cleanTitle = title.strip().lower()
@@ -253,11 +249,13 @@ def scrapeAudio(entry, audio_tag):
     try:
         audioUrls= {}
         audio_section = entry.find_all(audio_tag)
+        cloud_logger.info(f"Audio Segments: {audio_section}")
 
         count = 1
         for audio in audio_section:
             url = audio.get('src')
             if not url:
+                cloud_logger.info(f"URL: {url}")
                 source = audio.find('source')
                 url = source['src'] if source and source.has_attr('src') else None
             audioUrls[count] = url
@@ -270,13 +268,7 @@ def scrapeAudio(entry, audio_tag):
 def cookSoup(url):
     cloud_logger.info(f"Cooking soup with url: {url}")
     try:
-        cloud_logger.info("trying")
         response = requests.get(url, timeout=10)
-        cloud_logger.info(f"Redirect history: {response.history}")
-        cloud_logger.info(f"Response status code: {response.status_code}")
-        cloud_logger.info(f"Response content (first 100 chars): {response.text[:100]}")
-        cloud_logger.info(f"Full response length: {len(response.text)}")
-        cloud_logger.info(f"Full response: {response.text}")
         if response.status_code == 200:
             try:
                 cloud_logger.info("Attempting to parse with BeautifulSoup...")
