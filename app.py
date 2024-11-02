@@ -97,7 +97,7 @@ def scrapeBookOptions():
 
             cloud_logger.info("Calling cookSoup")
             soup = cookSoup(queryUrl)
-            cloud_logger.info("Soup created")
+            cloud_logger.info(f"Soup created: {soup}")
 
             cloud_logger.info("Getting book options")
             bookOptions = getBookOptions(soup, bookDict, site)
