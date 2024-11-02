@@ -145,6 +145,7 @@ def scrapeAudio():
             cloud_logger.info("Local storage error")
             return jsonify({'error': 'Session expired or no book options available.'}), 400
 
+
         # return audio files to front end
         audioFiles = chooseBook(bookOptions, selected_book_index)
         session['audioFiles'] = audioFiles
@@ -195,7 +196,7 @@ def download_audio():
                     break
                 yield chunk
     
-    return Response(generate(), mimetype='application/zip')
+    return Response(generate(), mimetype='application/octet-stream')
 
 def getQueryUrl(site, queryDict):
     try:
