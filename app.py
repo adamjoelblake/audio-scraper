@@ -103,14 +103,13 @@ def scrapeBookOptions():
         for book in bookOptions:
             cloud_logger.info(f"Entry Title: {book}")
         
-
         if bookOptions:
             # Cache the book options
             cloud_logger.info(f"Storing data locally")
             try:
                 cloud_logger.info(f"BOOK OPTIONS")
                 session['bookOptions'] = bookOptions
-                cloud_logger.info(f"Session options: {session['options']}")
+                cloud_logger.info(f"Session options: {session['bookOptions']}")
             except Exception as e:
                 cloud_logger.info(f"Unable to store bookOptions locally.")
             try:
