@@ -106,18 +106,21 @@ def scrapeBookOptions():
 
         if bookOptions:
             # Cache the book options
-            cloud_logger.info(f"Storing book options locally")
+            cloud_logger.info(f"Storing data locally")
             try:
+                cloud_logger.info(f"BOOK OPTIONS")
                 session['bookOptions'] = bookOptions
                 cloud_logger.info(f"Session options: {session['options']}")
             except Exception as e:
                 cloud_logger.info(f"Unable to store bookOptions locally.")
             try:
+                cloud_logger.info(f"BOOK DICT")
                 session['bookDict'] = bookDict
                 cloud_logger.info(f"Session bookDict: {session['bookDict']}")
             except Exception as e:
                 cloud_logger.info(f"Unable to store bookDict locally.")
             try:
+                cloud_logger.info(f"SITE")
                 session['site'] = site
                 cloud_logger.info(f"Session site: {site}")
             except Exception as e:
