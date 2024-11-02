@@ -79,61 +79,59 @@ def home():
 def scrapeBookOptions():
     if request.method == 'OPTIONS':
         return jsonify({'status': 'preflight'}), 200
-    
-    try:
-        # Get user input
-        data = request.json
-        cloud_logger.info(f"Received data: {data}")
-        book_title = data.get('title')
-        book_author = data.get('author')
-        cloud_logger.info(f"Book title: {book_title}")
-        bookDict = {'title': book_title, 'author': book_author}
 
-        # First half of main function
-        for site in siteNames:
-            cloud_logger.info(f"Calling getQueryUrl with {bookDict}")
-            queryUrl = getQueryUrl(site, bookDict)
-            cloud_logger.info(f"Query URL: {queryUrl}")
+    # Get user input
+    data = request.json
+    cloud_logger.info(f"Received data: {data}")
+    book_title = data.get('title')
+    book_author = data.get('author')
+    cloud_logger.info(f"Book title: {book_title}")
+    bookDict = {'title': book_title, 'author': book_author}
 
-            cloud_logger.info("Calling cookSoup")
-            soup = cookSoup(queryUrl)
-            cloud_logger.info(f"Soup created: {soup}")
+    # First half of main function
+    for site in siteNames:
+        cloud_logger.info(f"Calling getQueryUrl with {bookDict}")
+        queryUrl = getQueryUrl(site, bookDict)
+        cloud_logger.info(f"Query URL: {queryUrl}")
 
-            cloud_logger.info("Getting book options")
-            bookOptions = getBookOptions(soup, bookDict, site)
-            for book in bookOptions:
-                cloud_logger.info(f"Entry Title: {book}")
+        cloud_logger.info("Calling cookSoup")
+        soup = cookSoup(queryUrl)
+        cloud_logger.info(f"Soup created: {soup}")
+
+        cloud_logger.info("Getting book options")
+        bookOptions = getBookOptions(soup, bookDict, site)
+        for book in bookOptions:
+            cloud_logger.info(f"Entry Title: {book}")
+        
+
+        if bookOptions:
+            # Cache the book options
+            cloud_logger.info(f"Storing book options locally")
+            try:
+                session['bookOptions'] = bookOptions
+                cloud_logger.info(f"Session options: {session['options']}")
+            except Exception as e:
+                cloud_logger.info(f"Unable to store bookOptions locally.")
+            try:
+                session['bookDict'] = bookDict
+                cloud_logger.info(f"Session bookDict: {session['bookDict']}")
+            except Exception as e:
+                cloud_logger.info(f"Unable to store bookDict locally.")
+            try:
+                session['site'] = site
+                cloud_logger.info(f"Session site: {site}")
+            except Exception as e:
+                cloud_logger.info(f"Unable to store site locally.")
             
+            
+            cloud_logger.info(jsonify({'bookOptions': bookOptions}))
+            # Return book options to front end for user to choose
+            return jsonify({'bookOptions': bookOptions})
 
-            if bookOptions:
-                # Cache the book options
-                cloud_logger.info(f"Storing book options locally")
-                try:
-                    session['bookOptions'] = bookOptions
-                    cloud_logger.info(f"Session options: {session['options']}")
-                except Exception as e:
-                    cloud_logger.info(f"Unable to store bookOptions locally.")
-                try:
-                    session['bookDict'] = bookDict
-                    cloud_logger.info(f"Session bookDict: {session['bookDict']}")
-                except Exception as e:
-                    cloud_logger.info(f"Unable to store bookDict locally.")
-                try:
-                    session['site'] = site
-                    cloud_logger.info(f"Session site: {site}")
-                except Exception as e:
-                    cloud_logger.info(f"Unable to store site locally.")
-                
-                
-                cloud_logger.info(jsonify({'bookOptions': bookOptions}))
-                # Return book options to front end for user to choose
-                return jsonify({'bookOptions': bookOptions})
+    if not bookOptions:
+        return jsonify({'error': 'No matching books found!'}), 404
 
-        if not bookOptions:
-            return jsonify({'error': 'No matching books found!'}), 404
 
-    except Exception as e:
-        return jsonify({'error': str(e)}), 500
 
 # Second route: Accept user's book selection and scrape audio
 @app.route('/scrape/continue', methods=['POST'])
