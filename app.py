@@ -108,32 +108,22 @@ def scrapeBookOptions():
             cloud_logger.info(f"Storing data locally")
             try:
                 cloud_logger.info(f"BOOK OPTIONS")
-                session['bookOptions'] = bookOptions
-                cloud_logger.info(f"Session options: {session['bookOptions']}")
             except Exception as e:
                 cloud_logger.info(f"Unable to store bookOptions locally.")
             try:
-                cloud_logger.info(f"BOOK DICT")
                 session['bookDict'] = bookDict
-                cloud_logger.info(f"Session bookDict: {session['bookDict']}")
             except Exception as e:
                 cloud_logger.info(f"Unable to store bookDict locally.")
             try:
-                cloud_logger.info(f"SITE")
                 session['site'] = site
-                cloud_logger.info(f"Session site: {site}")
             except Exception as e:
                 cloud_logger.info(f"Unable to store site locally.")
             
-            
-            cloud_logger.info("yes")
             # Return book options to front end for user to choose
             return jsonify({'bookOptions': bookOptions})
 
     if not bookOptions:
         return jsonify({'error': 'No matching books found!'}), 404
-
-
 
 # Second route: Accept user's book selection and scrape audio
 @app.route('/scrape/continue', methods=['POST'])
@@ -175,6 +165,7 @@ def scrapeAudio():
 # Third route: Download the file from the external source and send it to the client
 @app.route('/download_all', methods=['GET'])
 def download_audio():
+    cloud_logger.info(f"Downloading audio")
     try:
         bookDict = session.get('bookDict')
         audioFiles = session.get('audioFiles')
