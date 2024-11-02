@@ -223,6 +223,7 @@ def getBookOptions(soup, bookDict, site):
         bookOptions = {}
         userTitle = bookDict.get('title').lower()
         entries = soup.find(section_tag, id=section_id).find_all(entry_tag)
+        cloud_logger.info(f"Entries: {entries}")
         for entry in entries:
             title = entry.find(entry_title_tag).text
             cleanTitle = title.strip().lower()
