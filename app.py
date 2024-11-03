@@ -184,6 +184,7 @@ def download_audio():
                     for index, file_url in audioFiles.items():
                         # download each audio file
                         response = requests.get(file_url, stream=True, timeout=15)
+                        cloud_logger.info(f"File {index} response status: {response.status_code}")
                         if response.status_code == 200:
                             zip_file.writestr(f"{bookDict['title']}_{index}.mp3", response.content)
                             cloud_logger.info(f"Successfully downloaded file {index}")
