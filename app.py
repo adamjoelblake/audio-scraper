@@ -188,9 +188,6 @@ def download_audio():
                     cloud_logger.info(f"File {index} response status: {response.status_code}")
                     
                     if response.status_code == 200:
-                        if index == 13:
-                            cloud_logger.info(f"Skipping file {index} as a test.")
-                            continue
                         try:
                             zip_file.writestr(f"{bookDict['title']}_{index}.mp3", response.content)
                             cloud_logger.info(f"Successfully downloaded file {index}")
