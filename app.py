@@ -180,14 +180,18 @@ def download_audio():
     def generate():
         with BytesIO() as zip_buffer:
             with zipfile.ZipFile(zip_buffer, 'w', zipfile.ZIP_DEFLATED ) as zip_file:
-                for index, file_url in audioFiles.items():
-                    # download each audio file
-                    cloud_logger.info(f"Attempting to download file at URL: {file_url}")
-                    response = requests.get(file_url, stream=True)
-                    if response.status_code == 200:
-                        zip_file.writestr(f"{bookDict['title']}_{index}.mp3", response.content)
-                    else:
-                        cloud_logger.info(f"Skipping file due to download error: {file_url}")
+                try:
+                    for index, file_url in audioFiles.items():
+                        # download each audio file
+                        cloud_logger.info(f"Attempting to download file at URL: {file_url}")
+                        response = requests.get(file_url, stream=True)
+                        if response.status_code == 200:
+                            zip_file.writestr(f"{bookDict['title']}_{index}.mp3", response.content)
+                            cloud_logger.info(f"Successfully downloaded file {index}")
+                        else:
+                            cloud_logger.error(f"Failed to download file {index} with status {response.status_code}")
+                except Exception as e:
+                    cloud_logger.error(f"Failed to download file {index} with status {response.status_code}")
             
             zip_buffer.seek(0)
             while True:
