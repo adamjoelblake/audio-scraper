@@ -8,6 +8,7 @@ import os
 import json
 import requests
 import psutil
+import time
 from tempfile import NamedTemporaryFile
 import logging
 import google.cloud.logging
@@ -178,36 +179,53 @@ def download_audio():
     if not bookDict or not audioFiles:
         return jsonify({'error': 'Audio files or bookDict missing from session'}), 400
 
+    def download_with_logging(url, index, retries=3, timeout=60):
+        attempt = 0
+        while attempt < retries:
+            try:
+                start_time = time.time()
+                response = requests.get(url, stream=True, timeout=timeout)
+                elapsed_time = time.time() - start_time
+                cloud_logger.info(f"File {index} download attempt {attempt + 1} took {elapsed_time:.2f} seconds.")
+                
+                if response.status_code == 200:
+                    cloud_logger.info(f"File {index} successfully downloaded with headers: {response.headers}")
+                    return response
+                else:
+                    cloud_logger.error(f"File {index} failed with status {response.status_code}")
+            except requests.RequestException as e:
+                cloud_logger.error(f"Download attempt {attempt + 1} failed for file {index} with error: {e}")
+            attempt += 1
+            time.sleep(1)  # Delay between retries
+        return None  # Return None if all retries fail
+    
+
     def generate():
         try:
             with NamedTemporaryFile(delete=False, suffix=".zip") as temp_zip:
-                with zipfile.ZipFile(temp_zip, 'w', zipfile.ZIP_DEFLATED ) as zip_file:
+                with zipfile.ZipFile(temp_zip, 'w', zipfile.ZIP_DEFLATED) as zip_file:
                     for index, file_url in audioFiles.items():
-                        try:
-                            # download each audio file
-                            response = requests.get(file_url, stream=True, timeout=60)
-                            cloud_logger.info(f"File {index} response status: {response.status_code}")
-                            
-                            if response.status_code == 200:
-                                try:
-                                    zip_file.writestr(f"{bookDict['title']}_{index}.mp3", response.content)
-                                    cloud_logger.info(f"Successfully downloaded file {index}")
-                                    memory_info = psutil.virtual_memory()
-                                    cpu_usage = psutil.cpu_percent()
-                                    cloud_logger.info(f"Memory usage after file {index}: {memory_info.percent}%, CPU usage: {cpu_usage}%")
-                                except Exception as e:
-                                    cloud_logger.info(f"Failed to write file {index} to ZIP: {e}", exc_info=True)
-                            else:
-                                cloud_logger.info(f"Failed to download file {index} with status {response.status_code}")
-                            del response
-
-                        except Exception as e:
-                            cloud_logger.info(f"Failed to download or write file {index}: {e}", exc_info=True)
-                            continue
+                        response = download_with_logging(file_url, index)
+                        if response:
+                            try:
+                                with response:
+                                    # Log detailed chunk-by-chunk download
+                                    with zip_file.open(f"{bookDict['title']}_{index}.mp3", 'w') as mp3_file:
+                                        for chunk in response.iter_content(chunk_size=4096):
+                                            if chunk:
+                                                mp3_file.write(chunk)
+                                        cloud_logger.info(f"Successfully added file {index} to ZIP.")
+                                
+                                # Log memory and CPU usage after each file
+                                memory_info = psutil.virtual_memory()
+                                cpu_usage = psutil.cpu_percent()
+                                cloud_logger.info(f"Memory usage after file {index}: {memory_info.percent}%, CPU usage: {cpu_usage}%")
+                            except Exception as e:
+                                cloud_logger.error(f"Failed to write file {index} to ZIP: {e}", exc_info=True)
+                        else:
+                            cloud_logger.error(f"Skipping file {index} after multiple failed attempts")
             temp_zip_path = temp_zip.name
-
-            # Stream ZIP file from disk as a response
-            return temp_zip_path
+            return temp_zip_path  # Path of the created ZIP file
         except Exception as e:
             cloud_logger.error(f"An error occurred in generate: {e}", exc_info=True)
             raise
