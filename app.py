@@ -178,7 +178,9 @@ def download_audio():
         return jsonify({'error': 'Audio files or bookDict missing from session'}), 400
 
     def generate():
-        with zipfile.ZipFile(BytesIO(), 'w', zipfile.ZIP_DEFLATED ) as zip_file:
+        zip_buffer = BytesIO()
+
+        with zipfile.ZipFile(zip_buffer, 'w', zipfile.ZIP_DEFLATED ) as zip_file:
             for index, file_url in audioFiles.items():
                 try:
                     # download each audio file
@@ -187,7 +189,8 @@ def download_audio():
                     
                     if response.status_code == 200:
                         try:
-                            zip_file.writestr(f"{bookDict['title']}_{index}.mp3", response.content)
+                            temp_buffer = BytesIO(response.content)
+                            zip_file.writestr(f"{bookDict['title']}_{index}.mp3", temp_buffer.getvalue())
                             cloud_logger.info(f"Successfully downloaded file {index}")
                         except Exception as e:
                             cloud_logger.error(f"Failed to write file {index} to ZIP: {e}", exc_info=True)
@@ -198,9 +201,9 @@ def download_audio():
                     cloud_logger.error(f"Failed to download or write file {index}: {e}", exc_info=True)
                     continue
         
-        zip_file.fp.seek(0)
+        zip_buffer.seek(0)
         while True:
-            chunk = zip_file.fp.read(4096)
+            chunk = zip_buffer.read(4096)
             if not chunk:
                 break
             yield chunk
