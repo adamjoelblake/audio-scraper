@@ -14,7 +14,8 @@ import logging
 import google.cloud.logging
 from google.cloud.logging.handlers import CloudLoggingHandler
 from google.cloud import storage
-from requests.exceptions import IncompleteRead, RequestException
+from requests.exceptions import RequestException
+from http.client import IncompleteRead
 
 
 # Initialize the Flask application
