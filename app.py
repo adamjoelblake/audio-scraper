@@ -179,7 +179,7 @@ def download_audio():
 
     def generate():
         with BytesIO() as zip_buffer:
-            with zipfile.ZipFile(zip_buffer, 'w', zipfile.ZIP_DEFLATED) as zip_file:
+            with zipfile.ZipFile(zip_buffer, 'w', zipfile.ZIP_STORED) as zip_file:
                 for index, file_url in audioFiles.items():
                     # download each audio file
                     cloud_logger.info(f"Attempting to download file at URL: {file_url}")
