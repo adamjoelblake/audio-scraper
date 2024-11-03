@@ -258,52 +258,6 @@ def download_audio():
     return response
     
 
-    def generate():
-        try:
-            with NamedTemporaryFile(delete=False, suffix=".zip") as temp_zip:
-                with zipfile.ZipFile(temp_zip, 'w', zipfile.ZIP_DEFLATED) as zip_file:
-                    for index, file_url in audioFiles.items():
-                        response = download_with_logging(file_url, index)
-                        if response:
-                            try:
-                                with response:
-                                    # Log detailed chunk-by-chunk download
-                                    with zip_file.open(f"{bookDict['title']}_{index}.mp3", 'w') as mp3_file:
-                                        for chunk in response.iter_content(chunk_size=4096):
-                                            if chunk:
-                                                mp3_file.write(chunk)
-                                        cloud_logger.info(f"Successfully added file {index} to ZIP.")
-                                
-                                # Log memory and CPU usage after each file
-                                memory_info = psutil.virtual_memory()
-                                cpu_usage = psutil.cpu_percent()
-                                cloud_logger.info(f"Memory usage after file {index}: {memory_info.percent}%, CPU usage: {cpu_usage}%")
-                            except Exception as e:
-                                cloud_logger.error(f"Failed to write file {index} to ZIP: {e}", exc_info=True)
-                        else:
-                            cloud_logger.error(f"Skipping file {index} after multiple failed attempts")
-            temp_zip_path = temp_zip.name
-            return temp_zip_path  # Path of the created ZIP file
-        except Exception as e:
-            cloud_logger.error(f"An error occurred in generate: {e}", exc_info=True)
-            raise
-    
-    # Call inner function to generate the ZIP file and get the file path
-    temp_zip_path = generate()
-
-    # Stream the ZIP file from disk
-    try:
-        response = send_file(temp_zip_path, as_attachment=True, download_name=f"{bookDict['title']}_audiobook.zip")
-    finally:
-        try:
-            os.remove(temp_zip_path)
-            cloud_logger.info(f"Temporary file {temp_zip_path} deleted successfully.")
-        except Exception as e:
-            cloud_logger.info(f"Failed to delete temporary file {temp_zip_path}: {e}", exc_info=True)
-    # Clean up the temporary file after sending the response
-    
-    return response
-
 def getQueryUrl(site, queryDict):
     try:
         queryTitle = queryDict.get('title').strip().replace(' ','+')
