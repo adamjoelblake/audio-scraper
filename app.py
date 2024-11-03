@@ -194,13 +194,13 @@ def download_audio():
                                 memory_info = psutil.virtual_memory()
                                 cloud_logger.info(f"Memory usage after file {index}: {memory_info.percent}%")
                             except Exception as e:
-                                cloud_logger.error(f"Failed to write file {index} to ZIP: {e}", exc_info=True)
+                                cloud_logger.info(f"Failed to write file {index} to ZIP: {e}", exc_info=True)
                         else:
-                            cloud_logger.error(f"Failed to download file {index} with status {response.status_code}")
+                            cloud_logger.info(f"Failed to download file {index} with status {response.status_code}")
                         del response
 
                     except Exception as e:
-                        cloud_logger.error(f"Failed to download or write file {index}: {e}", exc_info=True)
+                        cloud_logger.info(f"Failed to download or write file {index}: {e}", exc_info=True)
                         continue
         temp_zip_path = temp_zip.name
 
@@ -218,7 +218,7 @@ def download_audio():
             os.remove(temp_zip_path)
             cloud_logger.info(f"Temporary file {temp_zip_path} deleted successfully.")
         except Exception as e:
-            cloud_logger.error(f"Failed to delete temporary file {temp_zip_path}: {e}", exc_info=True)
+            cloud_logger.info(f"Failed to delete temporary file {temp_zip_path}: {e}", exc_info=True)
     # Clean up the temporary file after sending the response
     
     return response
@@ -300,7 +300,7 @@ def cookSoup(url):
                 cloud_logger.info("Attempting to parse with BeautifulSoup...")
                 soup = BeautifulSoup(response.text, 'html.parser')
                 if not soup or len(soup) == 0:
-                    cloud_logger.error("Soup object is empty or None. The page might be malformed.")
+                    cloud_logger.info("Soup object is empty or None. The page might be malformed.")
                 else:
                     # Optionally, check for specific tags
                     title_tag = soup.find('title')
@@ -308,7 +308,7 @@ def cookSoup(url):
                         cloud_logger.info(f"Page title: {title_tag.string}")
                         return soup
                     else:
-                        cloud_logger.error("No title tag found in the parsed HTML.")
+                        cloud_logger.info("No title tag found in the parsed HTML.")
                         cloud_logger.info(f"Parsed content preview: {soup.prettify()[:500]}")
                         return soup
             except:
