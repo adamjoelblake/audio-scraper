@@ -202,7 +202,7 @@ def download_audio():
         
         zip_buffer.seek(0)
         while True:
-            chunk = zip_buffer.read(4096)
+            chunk = zip_buffer.read(8192)
             if not chunk:
                 break
             yield chunk
