@@ -7,6 +7,7 @@ from bs4 import BeautifulSoup
 import os
 import json
 import requests
+import psutil
 import tempfile
 import logging
 import google.cloud.logging
@@ -191,6 +192,8 @@ def download_audio():
                         try:
                             zip_file.writestr(f"{bookDict['title']}_{index}.mp3", response.content)
                             zip_file.fp.flush()
+                            memory_info = psutil.virtual_memory()
+                            cloud_logger.info(f"Memory usage after file {index}: {memory_info.percent}%")
                             cloud_logger.info(f"Successfully downloaded file {index}")
                         except Exception as e:
                             cloud_logger.error(f"Failed to write file {index} to ZIP: {e}", exc_info=True)
