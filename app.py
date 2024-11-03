@@ -193,6 +193,8 @@ def download_audio():
                                 cloud_logger.error(f"Failed to write file {index} to ZIP: {e}", exc_info=True)
                         else:
                             cloud_logger.error(f"Failed to download file {index} with status {response.status_code}")
+                        if index == 8:
+                            break
                 except Exception as e:
                     cloud_logger.error(f"Failed to download file {index} with status {response.status_code}")
             
