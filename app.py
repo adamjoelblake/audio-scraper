@@ -192,7 +192,8 @@ def download_audio():
                                 zip_file.writestr(f"{bookDict['title']}_{index}.mp3", response.content)
                                 cloud_logger.info(f"Successfully downloaded file {index}")
                                 memory_info = psutil.virtual_memory()
-                                cloud_logger.info(f"Memory usage after file {index}: {memory_info.percent}%")
+                                cpu_usage = psutil.cpu_percent()
+                                cloud_logger.info(f"Memory usage after file {index}: {memory_info.percent}%, CPU usage: {cpu_usage}%")
                             except Exception as e:
                                 cloud_logger.info(f"Failed to write file {index} to ZIP: {e}", exc_info=True)
                         else:
