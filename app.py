@@ -186,8 +186,11 @@ def download_audio():
                         response = requests.get(file_url, stream=True, timeout=60)
                         cloud_logger.info(f"File {index} response status: {response.status_code}")
                         if response.status_code == 200:
-                            zip_file.writestr(f"{bookDict['title']}_{index}.mp3", response.content)
-                            cloud_logger.info(f"Successfully downloaded file {index}")
+                            try:
+                                zip_file.writestr(f"{bookDict['title']}_{index}.mp3", response.content)
+                                cloud_logger.info(f"Successfully downloaded file {index}")
+                            except Exception as e:
+                                cloud_logger.error(f"Failed to write file {index} to ZIP: {e}", exc_info=True)
                         else:
                             cloud_logger.error(f"Failed to download file {index} with status {response.status_code}")
                 except Exception as e:
