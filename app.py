@@ -14,6 +14,7 @@ import logging
 import google.cloud.logging
 from google.cloud.logging.handlers import CloudLoggingHandler
 from google.cloud import storage
+from requests.exceptions import IncompleteRead, RequestException
 
 
 # Initialize the Flask application
@@ -168,7 +169,7 @@ def scrapeAudio():
 # Third route: Download the file from the external source and send it to the client
 @app.route('/download_all', methods=['GET'])
 def download_audio():
-    cloud_logger.info(f"Downloading audio")
+    cloud_logger.info("Starting audio download process")
 
     bookDict = session.get('bookDict')
     audioFiles = session.get('audioFiles')
@@ -179,25 +180,81 @@ def download_audio():
     if not bookDict or not audioFiles:
         return jsonify({'error': 'Audio files or bookDict missing from session'}), 400
 
-    def download_with_logging(url, index, retries=3, timeout=60):
+    def download_with_logging(url, index, retries=3, timeout=120):
         attempt = 0
+        headers = {}
+        downloaded_data = b""
+
         while attempt < retries:
             try:
                 start_time = time.time()
-                response = requests.get(url, stream=True, timeout=timeout)
+                headers['Range'] = f"bytes={len(downloaded_data)}-"
+                response = requests.get(url, headers=headers, stream=True, timeout=timeout)
                 elapsed_time = time.time() - start_time
                 cloud_logger.info(f"File {index} download attempt {attempt + 1} took {elapsed_time:.2f} seconds.")
                 
-                if response.status_code == 200:
+                if response.status_code in (200, 206):  # 206 for partial content
                     cloud_logger.info(f"File {index} successfully downloaded with headers: {response.headers}")
-                    return response
+                    for chunk in response.iter_content(chunk_size=4096):
+                        if chunk:
+                            downloaded_data += chunk
+                    return downloaded_data
                 else:
                     cloud_logger.error(f"File {index} failed with status {response.status_code}")
-            except requests.RequestException as e:
+            except (IncompleteRead, RequestException) as e:
                 cloud_logger.error(f"Download attempt {attempt + 1} failed for file {index} with error: {e}")
             attempt += 1
             time.sleep(1)  # Delay between retries
+        cloud_logger.error(f"File {index} could not be downloaded after {retries} attempts.")
         return None  # Return None if all retries fail
+
+    def generate():
+        try:
+            with NamedTemporaryFile(delete=False, suffix=".zip") as temp_zip:
+                with zipfile.ZipFile(temp_zip, 'w', zipfile.ZIP_DEFLATED) as zip_file:
+                    for index, file_url in audioFiles.items():
+                        downloaded_data = download_with_logging(file_url, index)
+                        if downloaded_data:
+                            try:
+                                # Add the downloaded data to the ZIP
+                                zip_file.writestr(f"{bookDict['title']}_{index}.mp3", downloaded_data)
+                                cloud_logger.info(f"Successfully added file {index} to ZIP.")
+                                
+                                # Log memory, CPU, and disk usage after each file
+                                memory_info = psutil.virtual_memory()
+                                cpu_usage = psutil.cpu_percent()
+                                disk_info = psutil.disk_usage('/')
+                                cloud_logger.info(f"Memory: {memory_info.percent}%, CPU: {cpu_usage}%, Disk: {disk_info.percent}%")
+                                
+                            except Exception as e:
+                                cloud_logger.error(f"Failed to write file {index} to ZIP: {e}", exc_info=True)
+                        else:
+                            cloud_logger.error(f"Skipping file {index} after multiple failed attempts")
+                        time.sleep(2)  # Small delay between downloads to prevent throttling
+            temp_zip_path = temp_zip.name
+            return temp_zip_path  # Path of the created ZIP file
+        except Exception as e:
+            cloud_logger.error(f"An error occurred in generate: {e}", exc_info=True)
+            raise
+        finally:
+            # Ensure cleanup of partially created ZIP file if an error occurs
+            if 'temp_zip_path' in locals():
+                os.remove(temp_zip_path)
+
+    # Call inner function to generate the ZIP file and get the file path
+    temp_zip_path = generate()
+
+    # Stream the ZIP file from disk
+    try:
+        response = send_file(temp_zip_path, as_attachment=True, download_name=f"{bookDict['title']}_audiobook.zip")
+    finally:
+        try:
+            os.remove(temp_zip_path)
+            cloud_logger.info(f"Temporary file {temp_zip_path} deleted successfully.")
+        except Exception as e:
+            cloud_logger.error(f"Failed to delete temporary file {temp_zip_path}: {e}", exc_info=True)
+    
+    return response
     
 
     def generate():
