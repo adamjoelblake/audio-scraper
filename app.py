@@ -175,9 +175,6 @@ def download_audio():
     bookDict = session.get('bookDict')
     audioFiles = session.get('audioFiles')
 
-    cloud_logger.info(f"Session Book Dict: {bookDict}")
-    cloud_logger.info(f"Session Audio Files: {audioFiles}")
-    
     if not bookDict or not audioFiles:
         return jsonify({'error': 'Audio files or bookDict missing from session'}), 400
 
@@ -188,73 +185,44 @@ def download_audio():
 
         while attempt < retries:
             try:
-                start_time = time.time()
                 headers['Range'] = f"bytes={len(downloaded_data)}-"
-                response = requests.get(url, headers=headers, stream=True, timeout=timeout)
-                elapsed_time = time.time() - start_time
-                cloud_logger.info(f"File {index} download attempt {attempt + 1} took {elapsed_time:.2f} seconds.")
-                
-                if response.status_code in (200, 206):  # 206 for partial content
-                    cloud_logger.info(f"File {index} successfully downloaded with headers: {response.headers}")
-                    for chunk in response.iter_content(chunk_size=4096):
-                        if chunk:
-                            downloaded_data += chunk
-                    return downloaded_data
-                else:
-                    cloud_logger.error(f"File {index} failed with status {response.status_code}")
+                with requests.Session() as session:
+                    response = session.get(url, headers=headers, stream=True, timeout=timeout)
+                    cloud_logger.info(f"Attempt {attempt + 1} for file {index}: status {response.status_code}")
+
+                    if response.status_code in (200, 206):  # 206 for partial content
+                        for chunk in response.iter_content(chunk_size=4096):
+                            if chunk:
+                                downloaded_data += chunk
+                        return downloaded_data
+                    else:
+                        cloud_logger.error(f"File {index} failed with status {response.status_code}")
+
             except (IncompleteRead, RequestException) as e:
-                cloud_logger.error(f"Download attempt {attempt + 1} failed for file {index} with error: {e}")
-            attempt += 1
-            time.sleep(1)  # Delay between retries
+                cloud_logger.error(f"Download attempt {attempt + 1} for file {index} failed: {e}")
+                attempt += 1
+                time.sleep(1)  # Delay between retries
+
         cloud_logger.error(f"File {index} could not be downloaded after {retries} attempts.")
-        return None  # Return None if all retries fail
+        return None
 
     def generate():
-        try:
-            with NamedTemporaryFile(delete=False, suffix=".zip") as temp_zip:
-                with zipfile.ZipFile(temp_zip, 'w', zipfile.ZIP_DEFLATED) as zip_file:
-                    for index, file_url in audioFiles.items():
-                        downloaded_data = download_with_logging(file_url, index)
-                        if downloaded_data:
-                            try:
-                                # Add the downloaded data to the ZIP
-                                zip_file.writestr(f"{bookDict['title']}_{index}.mp3", downloaded_data)
-                                cloud_logger.info(f"Successfully added file {index} to ZIP.")
-                                
-                                # Log memory, CPU, and disk usage after each file
-                                memory_info = psutil.virtual_memory()
-                                cpu_usage = psutil.cpu_percent()
-                                disk_info = psutil.disk_usage('/')
-                                cloud_logger.info(f"Memory: {memory_info.percent}%, CPU: {cpu_usage}%, Disk: {disk_info.percent}%")
-                                
-                            except Exception as e:
-                                cloud_logger.error(f"Failed to write file {index} to ZIP: {e}", exc_info=True)
-                        else:
-                            cloud_logger.error(f"Skipping file {index} after multiple failed attempts")
-                        time.sleep(2)  # Small delay between downloads to prevent throttling
-            temp_zip_path = temp_zip.name
-            return temp_zip_path  # Path of the created ZIP file
-        except Exception as e:
-            cloud_logger.error(f"An error occurred in generate: {e}", exc_info=True)
-            raise
-        finally:
-            # Ensure cleanup of partially created ZIP file if an error occurs
-            if 'temp_zip_path' in locals():
-                os.remove(temp_zip_path)
+        with NamedTemporaryFile(delete=False, suffix=".zip") as temp_zip:
+            with zipfile.ZipFile(temp_zip, 'w', zipfile.ZIP_DEFLATED) as zip_file:
+                for index, file_url in audioFiles.items():
+                    downloaded_data = download_with_logging(file_url, index)
+                    if downloaded_data:
+                        zip_file.writestr(f"{bookDict['title']}_{index}.mp3", downloaded_data)
+                        cloud_logger.info(f"File {index} added to ZIP")
+                    else:
+                        cloud_logger.error(f"Skipping file {index} after multiple failures")
+            return temp_zip.name
 
-    # Call inner function to generate the ZIP file and get the file path
     temp_zip_path = generate()
-
-    # Stream the ZIP file from disk
-    try:
-        response = send_file(temp_zip_path, as_attachment=True, download_name=f"{bookDict['title']}_audiobook.zip")
-    finally:
-        try:
-            os.remove(temp_zip_path)
-            cloud_logger.info(f"Temporary file {temp_zip_path} deleted successfully.")
-        except Exception as e:
-            cloud_logger.error(f"Failed to delete temporary file {temp_zip_path}: {e}", exc_info=True)
+    response = send_file(temp_zip_path, as_attachment=True, download_name=f"{bookDict['title']}_audiobook.zip")
     
+    os.remove(temp_zip_path)
+    cloud_logger.info(f"Temporary file {temp_zip_path} deleted successfully.")
     return response
     
 
