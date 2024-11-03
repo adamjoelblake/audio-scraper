@@ -8,7 +8,7 @@ import os
 import json
 import requests
 import psutil
-import tempfile
+from tempfile import NamedTemporaryFile
 import logging
 import google.cloud.logging
 from google.cloud.logging.handlers import CloudLoggingHandler
@@ -179,42 +179,48 @@ def download_audio():
         return jsonify({'error': 'Audio files or bookDict missing from session'}), 400
 
     def generate():
-        zip_buffer = BytesIO()
+        with NamedTemporaryFile(delete=False, suffix=".zip") as temp_zip:
+            with zipfile.ZipFile(temp_zip, 'w', zipfile.ZIP_DEFLATED ) as zip_file:
+                for index, file_url in audioFiles.items():
+                    try:
+                        # download each audio file
+                        response = requests.get(file_url, stream=True, timeout=60)
+                        cloud_logger.info(f"File {index} response status: {response.status_code}")
+                        
+                        if response.status_code == 200:
+                            try:
+                                zip_file.writestr(f"{bookDict['title']}_{index}.mp3", response.content)
+                                cloud_logger.info(f"Successfully downloaded file {index}")
+                                memory_info = psutil.virtual_memory()
+                                cloud_logger.info(f"Memory usage after file {index}: {memory_info.percent}%")
+                            except Exception as e:
+                                cloud_logger.error(f"Failed to write file {index} to ZIP: {e}", exc_info=True)
+                        else:
+                            cloud_logger.error(f"Failed to download file {index} with status {response.status_code}")
+                        del response
 
-        with zipfile.ZipFile(zip_buffer, 'w', zipfile.ZIP_DEFLATED ) as zip_file:
-            for index, file_url in audioFiles.items():
-                try:
-                    # download each audio file
-                    response = requests.get(file_url, stream=True, timeout=60)
-                    cloud_logger.info(f"File {index} response status: {response.status_code}")
-                    
-                    if response.status_code == 200:
-                        try:
-                            zip_file.writestr(f"{bookDict['title']}_{index}.mp3", response.content)
-                            zip_file.fp.flush()
-                            memory_info = psutil.virtual_memory()
-                            cloud_logger.info(f"Memory usage after file {index}: {memory_info.percent}%")
-                            cloud_logger.info(f"Successfully downloaded file {index}")
-                        except Exception as e:
-                            cloud_logger.error(f"Failed to write file {index} to ZIP: {e}", exc_info=True)
-                    else:
-                        cloud_logger.error(f"Failed to download file {index} with status {response.status_code}")
-                    del response
+                    except Exception as e:
+                        cloud_logger.error(f"Failed to download or write file {index}: {e}", exc_info=True)
+                        continue
+        temp_zip_path = temp_zip.name
 
-                except Exception as e:
-                    cloud_logger.error(f"Failed to download or write file {index}: {e}", exc_info=True)
-                    continue
-        
-        zip_buffer.seek(0)
-        while True:
-            chunk = zip_buffer.read(8192)
-            if not chunk:
-                break
-            yield chunk
+        # Stream ZIP file from disk as a response
+        return temp_zip_path
     
-    response = Response(generate(), mimetype='application/octet-stream')
-    response.headers['Content-Disposition'] = f'attachment; filename="{bookDict["title"]}_audiobook.zip"'
-    response.headers['Content-Type'] = 'application/octet-stream'
+    # Call inner function to generate the ZIP file and get the file path
+    temp_zip_path = generate()
+
+    # Stream the ZIP file from disk
+    try:
+        response = send_file(temp_zip_path, as_attachment=True, download_name=f"{bookDict['title']}_audiobook.zip")
+    finally:
+        try:
+            os.remove(temp_zip_path)
+            cloud_logger.info(f"Temporary file {temp_zip_path} deleted successfully.")
+        except Exception as e:
+            cloud_logger.error(f"Failed to delete temporary file {temp_zip_path}: {e}", exc_info=True)
+    # Clean up the temporary file after sending the response
+    
     return response
 
 def getQueryUrl(site, queryDict):
