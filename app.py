@@ -187,7 +187,7 @@ def download_audio():
                     if response.status_code == 200:
                         zip_file.writestr(f"{bookDict['title']}_{index}.mp3", response.content)
                     else:
-                        continue
+                        cloud_logger.info(f"Skipping file due to download error: {file_url}")
             
             zip_buffer.seek(0)
             while True:
@@ -196,7 +196,10 @@ def download_audio():
                     break
                 yield chunk
     
-    return Response(generate(), mimetype='application/octet-stream')
+    response = Response(generate(), mimetype='application/octet-stream')
+    response.headers['Content-Disposition'] = f'attachment; filename="{bookDict["title"]}_audiobook.zip"'
+    response.headers['Content-Type'] = 'application/octet-stream'
+    return response
 
 def getQueryUrl(site, queryDict):
     try:
