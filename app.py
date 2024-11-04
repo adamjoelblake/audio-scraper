@@ -14,6 +14,7 @@ import logging
 import google.cloud.logging
 from google.cloud.logging.handlers import CloudLoggingHandler
 from google.cloud import storage
+import gc
 
 
 # Initialize the Flask application
@@ -179,7 +180,7 @@ def download_audio():
     if not bookDict or not audioFiles:
         return jsonify({'error': 'Audio files or bookDict missing from session'}), 400
 
-    def download_with_logging(url, index, retries=3, timeout=60):
+    def download_with_logging(url, index, retries=3, timeout=90):
         attempt = 0
         while attempt < retries:
             try:
@@ -196,7 +197,7 @@ def download_audio():
             except requests.RequestException as e:
                 cloud_logger.error(f"Download attempt {attempt + 1} failed for file {index} with error: {e}")
             attempt += 1
-            time.sleep(1)  # Delay between retries
+            time.sleep(2)  # Delay between retries
         return None  # Return None if all retries fail
     
 
@@ -221,6 +222,9 @@ def download_audio():
                                 memory_info = psutil.virtual_memory()
                                 cpu_usage = psutil.cpu_percent()
                                 cloud_logger.info(f"Memory usage after file {index}: {memory_info.percent}%, CPU usage: {cpu_usage}%")
+
+                                del response
+                                gc.collect()
                             except Exception as e:
                                 cloud_logger.error(f"Failed to write file {index} to ZIP: {e}", exc_info=True)
                         else:
