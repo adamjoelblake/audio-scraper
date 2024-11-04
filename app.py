@@ -179,6 +179,13 @@ def download_audio():
     
     if not bookDict or not audioFiles:
         return jsonify({'error': 'Audio files or bookDict missing from session'}), 400
+    
+    def log_disk_io():
+        """Logs the current disk I/O statistics."""
+        disk_io = psutil.disk_io_counters()
+        cloud_logger.info(f"Disk I/O - Read Count: {disk_io.read_count}, Write Count: {disk_io.write_count}, "
+                          f"Read Bytes: {disk_io.read_bytes / (1024 * 1024):.2f} MB, "
+                          f"Write Bytes: {disk_io.write_bytes / (1024 * 1024):.2f} MB")
 
     def download_with_logging(url, index, retries=3, timeout=180):
         attempt = 0
@@ -222,6 +229,7 @@ def download_audio():
                                 memory_info = psutil.virtual_memory()
                                 cpu_usage = psutil.cpu_percent()
                                 cloud_logger.info(f"Memory usage after file {index}: {memory_info.percent}%, CPU usage: {cpu_usage}%")
+                                log_disk_io()
 
                                 del response
                                 gc.collect()
