@@ -14,7 +14,7 @@ import logging
 import google.cloud.logging
 from google.cloud.logging.handlers import CloudLoggingHandler
 from google.cloud import storage
-from requests.exceptions import RequestException
+from requests.exceptions import RequestException, Timeout, ConnectionError
 from http.client import IncompleteRead
 
 
@@ -185,20 +185,26 @@ def download_audio():
 
         while attempt < retries:
             try:
-                headers['Range'] = f"bytes={len(downloaded_data)}-"
                 with requests.Session() as session:
-                    response = session.get(url, headers=headers, stream=True, timeout=timeout)
+                    response = session.get(url, stream=True, timeout=timeout)
                     cloud_logger.info(f"Attempt {attempt + 1} for file {index}: status {response.status_code}")
 
-                    if response.status_code in (200, 206):  # 206 for partial content
+                    if response.status_code ==200:
+                        content_length = int(response.headers.get('Content-Length', 0))
+
                         for chunk in response.iter_content(chunk_size=4096):
                             if chunk:
                                 downloaded_data += chunk
+                        
+                        if content_length and len(downloaded_data) < content_length:
+                            cloud_logger.error(f"Incomplete download for file {index}: expected {content_length} bytes, got {len(downloaded_data)} bytes.")
+                            raise RequestException("Incomplete content")
+                        
                         return downloaded_data
                     else:
                         cloud_logger.error(f"File {index} failed with status {response.status_code}")
 
-            except (IncompleteRead, RequestException) as e:
+            except (Timeout, ConnectionError, RequestException) as e:
                 cloud_logger.error(f"Download attempt {attempt + 1} for file {index} failed: {e}")
                 attempt += 1
                 time.sleep(1)  # Delay between retries
