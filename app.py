@@ -180,7 +180,7 @@ def download_audio():
     if not bookDict or not audioFiles:
         return jsonify({'error': 'Audio files or bookDict missing from session'}), 400
 
-    def download_with_logging(url, index, retries=3, timeout=90):
+    def download_with_logging(url, index, retries=3, timeout=180):
         attempt = 0
         while attempt < retries:
             try:
