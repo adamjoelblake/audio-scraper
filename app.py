@@ -209,6 +209,7 @@ def download_audio():
                         if response:
                             try:
                                 with response:
+                                    cloud_logger.info(f"Attempting to add file {index} to ZIP.")
                                     # Log detailed chunk-by-chunk download
                                     with zip_file.open(f"{bookDict['title']}_{index}.mp3", 'w') as mp3_file:
                                         for chunk in response.iter_content(chunk_size=4096):
