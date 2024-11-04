@@ -187,7 +187,7 @@ def download_audio():
                           f"Read Bytes: {disk_io.read_bytes / (1024 * 1024):.2f} MB, "
                           f"Write Bytes: {disk_io.write_bytes / (1024 * 1024):.2f} MB")
 
-    def download_with_logging(url, index, retries=3, timeout=180):
+    def download_with_logging(url, index, retries=3, timeout=None):
         attempt = 0
         while attempt < retries:
             try:
